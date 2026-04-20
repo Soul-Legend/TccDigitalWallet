@@ -83,6 +83,35 @@ export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
 
 ---
 
+## Avisos Conhecidos do Build (Gradle)
+
+Os seguintes avisos aparecem durante o build Android e **não são corrigíveis** sem atualizar pacotes de terceiros. Todos vêm de `node_modules`:
+
+### Avisos de AndroidManifest.xml (`package=` attribute)
+
+Pacotes afetados: `@hyperledger/anoncreds-react-native`, `@hyperledger/aries-askar-react-native`, `react-native-fs`, `react-native-encrypted-storage`, `react-native-get-random-values`, `react-native-safe-area-context`, `react-native-screens`, `react-native-svg`.
+
+AGP moderno exige `namespace` em `build.gradle` ao invés de `package` no `AndroidManifest.xml`. Estes avisos são cosméticos e não afetam o build.
+
+### Avisos de API Depreciada (Java/Kotlin)
+
+- `react-native-screens`: ~30 avisos (MapBuilder, statusBarColor, FrameCallback, etc.)
+- `react-native-safe-area-context`: ReactModuleInfo, hasConstants, uiImplementation
+- `react-native-svg`: processTransform marcado para remoção
+- `@hyperledger/*`: APIs de TurboModule depreciadas
+
+Todos requerem atualização pelos mantenedores dos pacotes.
+
+### Avisos de Codegen (`$` in identifier)
+
+Gerados automaticamente pelo React Native Codegen para `react-native-screens` e `react-native-svg`. Inofensivos.
+
+### Avisos de C++17 (corrigidos)
+
+Os pacotes Hyperledger compilavam com C++14, mas os headers do RN 0.76 usam C++17. O script `scripts/patch-hyperledger-cmake.js` corrige isto automaticamente via `postinstall`.
+
+---
+
 ## Problemas de Build
 
 ### Erro: "Execution failed for task ':app:installDebug'"
@@ -186,6 +215,24 @@ npm run android
 ---
 
 ## Problemas de Execução
+
+### Erro: "crypto.subtle must be defined, consider polyfill"
+
+**Sintoma**: App inicializa mas operações criptográficas falham com erro `crypto.subtle must be defined`
+
+**Causa**: `@noble/ed25519` v3 usa `crypto.subtle` (WebCrypto) por padrão para operações assíncronas (`signAsync`, `verifyAsync`, `getPublicKeyAsync`). React Native (Hermes) não implementa WebCrypto.
+
+**Solução**: Em `src/services/CryptoService.ts`, configure tanto `sha512` (sync) quanto `sha512Async` (async):
+```typescript
+import * as ed from '@noble/ed25519';
+import { sha512 } from '@noble/hashes/sha512';
+
+ed.hashes.sha512 = sha512;
+ed.hashes.sha512Async = async (...msgs: Uint8Array[]) =>
+  sha512(ed.etc.concatBytes(...msgs));
+```
+
+---
 
 ### App crasha na inicialização
 
