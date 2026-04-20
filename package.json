@@ -14,7 +14,8 @@
     "typecheck": "tsc --noEmit",
     "test": "jest --silent",
     "test:verbose": "jest",
-    "ci": "npm run typecheck && npm run lint && npm test"
+    "ci": "npm run typecheck && npm run lint && npm test",
+    "postinstall": "node scripts/patch-hyperledger-cmake.js"
   },
   "dependencies": {
     "@credo-ts/anoncreds": "^0.5.19",
