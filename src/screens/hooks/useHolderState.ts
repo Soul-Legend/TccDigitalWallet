@@ -1,5 +1,6 @@
 import {useEffect, useState, useCallback} from 'react';
-import {Alert, Clipboard} from 'react-native';
+import {Alert} from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import {useAppStore} from '../../stores/useAppStore';
 import {VerifiableCredential, ConsentData, PresentationExchangeRequest} from '../../types';
 import {TransportMode} from '../../services/TransportService';
@@ -241,7 +242,7 @@ export function useHolderState() {
       setPresentationOutput(presentationJson);
 
       if (transportMode === 'clipboard') {
-        Clipboard.setString(presentationJson);
+        await Clipboard.setStringAsync(presentationJson);
         setSuccess('Apresentação criada e copiada para área de transferência!');
       } else {
         setSuccess('Apresentação criada! Escaneie o QR Code abaixo com o verificador.');
@@ -278,9 +279,9 @@ export function useHolderState() {
     setPresentationOutput(null);
   }, []);
 
-  const handleCopyOutput = useCallback(() => {
+  const handleCopyOutput = useCallback(async () => {
     if (presentationOutput) {
-      Clipboard.setString(presentationOutput);
+      await Clipboard.setStringAsync(presentationOutput);
       setSuccess('Apresentação copiada para área de transferência!');
       setTimeout(() => setSuccess(null), 3000);
     }

@@ -669,7 +669,7 @@ Remove todos os emissores e chaves da cadeia de confiança.
 
 ## CryptoService
 
-Operações criptográficas de baixo nível. Usa `crypto-js` para SHA-256 e `@noble/ed25519` para assinaturas.
+Operações criptográficas de baixo nível. Usa `@noble/hashes/sha256` para SHA-256 e `@noble/ed25519` (v3+) para assinaturas Ed25519.
 
 **Construtor**: `new CryptoService(logger?: ILogService)`
 

@@ -42,3 +42,6 @@ yarn-error.*
 
 # proving keys
 *.zkey
+
+# third-party library documentation (reference only, not project output)
+docs/libs_Docs/

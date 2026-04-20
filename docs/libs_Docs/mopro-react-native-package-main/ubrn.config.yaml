@@ -1,6 +1,0 @@
-rust:
-  directory: /Users/zhengyawen/Documents/GitHub/mopro-example-app
-  manifestPath: Cargo.toml
-
-android:
-    apiLevel: 28

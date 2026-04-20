@@ -22,7 +22,7 @@ Registro das decisões técnicas tomadas durante o desenvolvimento, com razões,
 
 ### React Native como Framework
 
-**Escolha**: React Native 0.76.5 com TypeScript 5.0.4
+**Escolha**: React Native 0.76.9 com Expo SDK 52 e TypeScript 5.0.4
 
 **Razões**:
 - Cross-platform com acesso a APIs nativas de segurança (Keystore)
@@ -105,7 +105,7 @@ Registro das decisões técnicas tomadas durante o desenvolvimento, com razões,
 
 ### Ed25519 para assinaturas (SD-JWT)
 
-CryptoService usa `@noble/ed25519` para assinar credenciais SD-JWT e apresentações. Assinaturas de 64 bytes. SHA-256 via `crypto-js` para hashing.
+CryptoService usa `@noble/ed25519` (v3+) para assinar credenciais SD-JWT e apresentações. Assinaturas de 64 bytes. SHA-256 via `@noble/hashes/sha256`; SHA-512 (necessário internamente pelo Ed25519) via `@noble/hashes/sha512`.
 
 O agente Credo gerencia suas próprias chaves Ed25519 via Askar internamente.
 

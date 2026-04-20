@@ -1,5 +1,4 @@
-// @ts-ignore crypto-js has no type declarations
-import CryptoJS from 'crypto-js';
+import {sha256} from '@noble/hashes/sha256';
 import * as ed from '@noble/ed25519';
 import {sha512} from '@noble/hashes/sha512';
 import {CryptoError} from './ErrorHandler';
@@ -7,12 +6,12 @@ import LogServiceInstance from './LogService';
 import type {ILogService} from '../types';
 
 // @noble/ed25519 v3+ requires configuring SHA-512 for sync operations
-ed.hashes.sha512 = (...m: Uint8Array[]) => sha512(ed.etc.concatBytes(...m)) as ed.Bytes;
+ed.hashes.sha512 = sha512;
 
 /**
  * CryptoService - Handles cryptographic operations
  *
- * Uses crypto-js for SHA-256 hashing and @noble/ed25519 for signatures.
+ * Uses @noble/hashes for SHA-256 hashing and @noble/ed25519 for signatures.
  * Both are pure JavaScript libraries that work on React Native (Hermes).
  */
 
@@ -45,13 +44,10 @@ class CryptoService {
     module: 'emissor' | 'titular' | 'verificador' = 'titular',
   ): Promise<string> {
     try {
-      const input = typeof data === 'string' ? data : toHex(data);
-      const hashOutput =
-        typeof data === 'string'
-          ? CryptoJS.SHA256(data).toString(CryptoJS.enc.Hex)
-          : CryptoJS.SHA256(CryptoJS.enc.Hex.parse(input)).toString(
-              CryptoJS.enc.Hex,
-            );
+      const dataBytes =
+        typeof data === 'string' ? new TextEncoder().encode(data) : data;
+      const hashBytes = sha256(dataBytes);
+      const hashOutput = toHex(hashBytes);
 
       this.logger.logHashComputation(module, 'SHA-256', hashOutput, true);
       return hashOutput;
@@ -158,12 +154,20 @@ class CryptoService {
     module: 'emissor' | 'titular' | 'verificador' = 'titular',
   ): Promise<string> {
     try {
-      let combined = '';
+      const parts: Uint8Array[] = [];
       for (const value of values) {
-        combined +=
-          typeof value === 'string' ? value : String.fromCharCode(...value);
+        parts.push(
+          typeof value === 'string' ? new TextEncoder().encode(value) : value,
+        );
       }
-      const hashOutput = CryptoJS.SHA256(combined).toString(CryptoJS.enc.Hex);
+      const totalLen = parts.reduce((sum, p) => sum + p.length, 0);
+      const combined = new Uint8Array(totalLen);
+      let offset = 0;
+      for (const p of parts) {
+        combined.set(p, offset);
+        offset += p.length;
+      }
+      const hashOutput = toHex(sha256(combined));
 
       this.logger.logHashComputation(module, 'SHA-256', hashOutput, true);
       return hashOutput;

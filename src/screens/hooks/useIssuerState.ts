@@ -1,5 +1,5 @@
 import {useEffect, useState, useCallback, useReducer} from 'react';
-import {Clipboard} from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import {useAppStore} from '../../stores/useAppStore';
 import {StudentData, TrustedIssuer} from '../../types';
 import CredentialService from '../../services/CredentialService';
@@ -242,7 +242,7 @@ export function useIssuerState() {
         setIssuerDID(issuerDID);
       }
 
-      Clipboard.setString(credential);
+      Clipboard.setStringAsync(credential);
 
       addLog({
         operation: 'credential_issuance',
@@ -283,7 +283,7 @@ export function useIssuerState() {
 
   const handleCopyCredential = useCallback(() => {
     if (issuedCredential) {
-      Clipboard.setString(issuedCredential);
+      Clipboard.setStringAsync(issuedCredential);
       setSuccessMessage('Token copiado para a área de transferência!');
     }
   }, [issuedCredential]);

@@ -1,6 +1,6 @@
 import {StudentData, VerifiableCredential, ICredentialFormat} from '../types';
 import type {ILogService, IStorageService, IDIDService, IAgentService, IAnonCredsService} from '../types';
-import {Clipboard} from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import DIDServiceInstance from './DIDService';
 import StorageServiceInstance from './StorageService';
 import LogServiceInstance from './LogService';
@@ -418,7 +418,7 @@ class CredentialService {
    */
   async copyToClipboard(credential: string): Promise<void> {
     try {
-      Clipboard.setString(credential);
+      await Clipboard.setStringAsync(credential);
 
       this.logger.captureEvent(
         'credential_issuance',

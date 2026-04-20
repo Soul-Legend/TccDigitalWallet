@@ -2,7 +2,7 @@
 
 ## Visão geral
 
-Aplicativo React Native 0.76.5 (Android) que implementa os três papéis do modelo SSI (Emissor, Titular, Verificador) em um único binário. A troca de credenciais e apresentações é feita via área de transferência (clipboard). Não há comunicação de rede entre os papéis.
+Aplicativo React Native 0.76.9 com Expo SDK 52 (Android) que implementa os três papéis do modelo SSI (Emissor, Titular, Verificador) em um único binário. A troca de credenciais e apresentações é feita via área de transferência (clipboard). Não há comunicação de rede entre os papéis.
 
 ## Camadas
 
@@ -151,15 +151,15 @@ Circuitos são arquivos `.zkey` esperados em `RNFS.DocumentDirectoryPath/circuit
 ### CryptoService
 
 Operações criptográficas de baixo nível independentes do agente Credo:
-- `computeHash(data, module)`: SHA-256 via `crypto-js`
-- `signData(data, privateKeyHex, module)`: Ed25519 via `@noble/ed25519`
+- `computeHash(data, module)`: SHA-256 via `@noble/hashes/sha256`
+- `signData(data, privateKeyHex, module)`: Ed25519 via `@noble/ed25519` (v3+, com SHA-512 configurado via `@noble/hashes/sha512`)
 - `verifySignature(data, signatureHex, publicKeyHex)`: Ed25519
 - `generateNonce()`: Nonce criptográfico
-- `computeCompositeHash(parts[], module)`: Hash de múltiplas partes
+- `computeCompositeHash(parts[], module)`: Hash SHA-256 de múltiplas partes concatenadas como `Uint8Array`
 
 Usado pelo PresentationService (SD-JWT hashing/signing) e VerificationService (SD-JWT verification).
 
-**Segurança**: O fallback para `Math.random()` foi removido. Se `react-native-get-random-values` não estiver disponível, o serviço lança `CryptoError` em vez de gerar bytes previsíveis.
+**Segurança**: O fallback para `Math.random()` foi removido. Se `react-native-get-random-values` não estiver disponível, o serviço lança `CryptoError` em vez de gerar bytes previsíveis. O polyfill é importado em `index.ts` antes do entry point do Expo Router.
 
 ### TransportService
 
@@ -190,7 +190,7 @@ Registro de eventos criptográficos com dados sensíveis ofuscados. Cada entrada
 
 ### Encoding shim
 
-`src/services/encoding.ts` é um polyfill mínimo para o engine Hermes do React Native 0.76, que não expõe globais `Buffer` / `TextEncoder` / `TextDecoder` por padrão. O módulo é importado em ponto único e re-exporta utilitários `utf8ToBytes`, `bytesToUtf8`, `stringToBase64Url` e `base64UrlToBytes` para uso pelos serviços criptográficos.
+`src/services/encoding.ts` é um polyfill mínimo para o engine Hermes do React Native 0.76.9, que não expõe globais `Buffer` / `TextEncoder` / `TextDecoder` por padrão. O módulo é importado em ponto único e re-exporta utilitários `utf8ToBytes`, `bytesToUtf8`, `stringToBase64Url` e `base64UrlToBytes` para uso pelos serviços criptográficos.
 
 ## Fluxos de dados
 

@@ -224,12 +224,7 @@ Verifique `android/app/src/main/AndroidManifest.xml`:
 <uses-permission android:name="android.permission.INTERNET" />
 ```
 
-Para desenvolvimento, adicione:
-```xml
-<application
-  android:usesCleartextTraffic="true"
-  ...>
-```
+> **Nota**: O plugin `withDataExtractionRules` configura `android:usesCleartextTraffic="false"` por segurança. Este projeto não faz requisições de rede entre módulos — toda comunicação é via clipboard. Se houver necessidade de acesso HTTP em desenvolvimento, crie um config plugin separado para o perfil de desenvolvimento.
 
 ---
 
@@ -310,7 +305,7 @@ console.log('Request:', JSON.stringify(request, null, 2));
 // Limpe os dados do app:
 // Configurações > Apps > Carteira > Limpar dados
 // Ou via ADB:
-// adb shell pm clear com.carteiraidentidadeacademica
+// adb shell pm clear com.anonymous.DigitalWalletExpo
 ```
 
 ---
@@ -424,7 +419,7 @@ if (logs.length > MAX_LOGS) {
 **Monitoramento**:
 ```bash
 # Veja uso de memória
-adb shell dumpsys meminfo com.carteiraidentidadeacademica
+adb shell dumpsys meminfo com.anonymous.DigitalWalletExpo
 ```
 
 ---
@@ -548,12 +543,16 @@ react-native-debugger
 
 ---
 
-### Flipper
+### Expo Dev Tools
+
+Expo projects use the built-in developer menu and Expo Dev Tools instead of Flipper.
 
 ```bash
-# Já vem com React Native 0.76
-# Abra Flipper e conecte ao app
-# Veja logs, network, layout, etc.
+# Start the dev server
+npx expo start
+
+# Press 'j' to open React DevTools
+# Press 'm' to toggle the developer menu on device/emulator
 ```
 
 ---
@@ -588,11 +587,8 @@ rm -rf node_modules package-lock.json
 rm -rf $TMPDIR/metro-*
 rm -rf $TMPDIR/haste-*
 
-# Limpe build do Android
-cd android
-./gradlew clean
-./gradlew cleanBuildCache
-cd ..
+# Regenere nativos via Expo prebuild
+npx expo prebuild --clean
 
 # Reinstale
 npm install
@@ -607,10 +603,10 @@ npm run android
 
 ```bash
 # Desinstale o app
-adb uninstall com.carteiraidentidadeacademica
+adb uninstall com.anonymous.DigitalWalletExpo
 
 # Limpe dados
-adb shell pm clear com.carteiraidentidadeacademica
+adb shell pm clear com.anonymous.DigitalWalletExpo
 
 # Reinstale
 npm run android

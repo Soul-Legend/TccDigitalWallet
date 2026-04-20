@@ -6,8 +6,8 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Clipboard,
 } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import {useAppStore} from '../stores/useAppStore';
 import {LoadingIndicator, ErrorMessage, SuccessMessage, TransportModeSelector} from '../components';
 import {Scenario, PresentationExchangeRequest, ValidationResult} from '../types';
@@ -169,7 +169,7 @@ const VerifierScreen: React.FC = () => {
    */
   const handleCopyRequest = () => {
     if (generatedRequest) {
-      Clipboard.setString(generatedRequest);
+      Clipboard.setStringAsync(generatedRequest);
       setSuccess('Requisição copiada para área de transferência!');
       setTimeout(() => setSuccess(null), 3000);
     }
