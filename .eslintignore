@@ -1,0 +1,13 @@
+node_modules/
+android/
+ios/
+docs/
+build/
+dist/
+*.config.js
+metro.config.js
+babel.config.js
+jest.config.js
+jest.setup.js
+jest-custom-reporter.js
+__mocks__/

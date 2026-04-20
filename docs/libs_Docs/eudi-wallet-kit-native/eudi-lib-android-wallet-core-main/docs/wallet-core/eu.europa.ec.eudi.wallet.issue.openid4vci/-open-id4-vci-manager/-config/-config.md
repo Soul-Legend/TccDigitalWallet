@@ -1,0 +1,9 @@
+//[wallet-core](../../../../index.md)/[eu.europa.ec.eudi.wallet.issue.openid4vci](../../index.md)/[OpenId4VciManager](../index.md)/[Config](index.md)/[Config](-config.md)
+
+# Config
+
+[androidJvm]\
+
+@[JvmOverloads](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html)
+
+constructor(issuerUrl: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html), clientAuthenticationType: [OpenId4VciManager.ClientAuthenticationType](../-client-authentication-type/index.md), authFlowRedirectionURI: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html), authorizationHandler: [AuthorizationHandler](../../-authorization-handler/index.md)? = null, dPoPUsage: [OpenId4VciManager.Config.DPoPUsage](-d-po-p-usage/index.md) = DPoPUsage.IfSupported(), parUsage: [Int](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-int/index.html) = IF_SUPPORTED)
