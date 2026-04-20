@@ -31,7 +31,8 @@
     "plugins": [
       "expo-router",
       "./plugins/withZkeyAssetPackaging",
-      "./plugins/withDataExtractionRules"
+      "./plugins/withDataExtractionRules",
+      "expo-asset"
     ]
   }
 }
