@@ -7,6 +7,8 @@ import LogServiceInstance from './LogService';
 import AgentServiceInstance from './AgentService';
 import AnonCredsServiceInstance from './AnonCredsService';
 import {CryptoError, ValidationError} from './ErrorHandler';
+import {getKeyFromVerificationMethod} from '@credo-ts/core';
+import {Buffer} from 'buffer';
 import {
   CredentialFormat,
   CredentialFormatType,
@@ -136,6 +138,20 @@ class CredentialService {
 
       return {did, publicKey};
     } catch (error) {
+      this.logger.captureEvent(
+        'error',
+        'emissor',
+        {
+          parameters: {
+            action: 'issuer_did_generation_failed',
+            errorMessage: error instanceof Error ? error.message : String(error),
+            errorName: error instanceof Error ? error.name : typeof error,
+          },
+          stack_trace: error instanceof Error ? error.stack : undefined,
+        },
+        false,
+        error instanceof Error ? error : new Error(String(error)),
+      );
       throw new CryptoError(
         'Failed to generate issuer DID',
         'key_generation',
@@ -296,15 +312,19 @@ class CredentialService {
       const headerBase64 = stringToBase64Url(JSON.stringify(header));
       const payloadBase64 = stringToBase64Url(JSON.stringify(payload));
 
-      const dataToSign = utf8ToBytes(`${headerBase64}.${payloadBase64}`);
+      const dataToSign = Buffer.from(`${headerBase64}.${payloadBase64}`, 'utf-8');
+
+      // Extract the proper Key instance from the verification method.
+      // Credo's wallet.sign() expects a Key object (not raw bytes) so it
+      // can look up the matching private key in Askar.
+      const signingKey = getKeyFromVerificationMethod(verificationMethod);
 
       // Resolve wallet via either the public (`agent.wallet`) or context
       // (`agent.context.wallet`) surface depending on the Credo version /
-      // mock in use. The signing key is the verification method's public
-      // key reference; the wallet looks up the matching private key.
-      type WalletSignArg = {data: Uint8Array; key: unknown};
+      // mock in use.
+      type WalletSignArg = {data: Buffer; key: unknown};
       type WalletLike = {
-        sign: (arg: WalletSignArg) => Promise<{signature: Uint8Array}>;
+        sign: (arg: WalletSignArg) => Promise<Buffer>;
       };
       const wallet: WalletLike | undefined =
         (agent as {wallet?: WalletLike}).wallet ??
@@ -317,27 +337,29 @@ class CredentialService {
         );
       }
 
-      // Credo's wallet always returns `{signature: Uint8Array}` — the previous
-      // implementation had a defensive `?? signResult` fallback for raw-bytes
-      // returns, but no version of Credo (>= 0.4) emits that shape. Keeping it
-      // would silently mask a future API drift, so we now assert the
-      // documented contract directly.
-      const signResult = await wallet.sign({
-        data: dataToSign,
-        key: (verificationMethod as {publicKey?: unknown}).publicKey,
-      });
-      if (!signResult || !('signature' in signResult)) {
-        throw new CryptoError(
-          'Credo wallet.sign() returned an unexpected shape (missing `signature`)',
-          'signature',
-          {got: typeof signResult},
-        );
-      }
-      const signatureBytes = toUint8Array(signResult.signature);
+      // Credo's wallet.sign() returns the signature Buffer directly.
+      const signatureBytes = toUint8Array(
+        await wallet.sign({data: dataToSign, key: signingKey}),
+      );
 
       const signatureBase64 = bytesToBase64Url(signatureBytes);
       return `${headerBase64}.${payloadBase64}.${signatureBase64}`;
     } catch (error) {
+      this.logger.captureEvent(
+        'error',
+        'emissor',
+        {
+          parameters: {
+            action: 'sdjwt_sign_failed',
+            errorMessage: error instanceof Error ? error.message : String(error),
+            errorName: error instanceof Error ? error.name : typeof error,
+            issuerDID,
+          },
+          stack_trace: error instanceof Error ? error.stack : undefined,
+        },
+        false,
+        error instanceof Error ? error : new Error(String(error)),
+      );
       throw new CryptoError(
         'Failed to sign credential as SD-JWT',
         'signature',
@@ -404,6 +426,20 @@ class CredentialService {
 
       return JSON.stringify(envelope);
     } catch (error) {
+      this.logger.captureEvent(
+        'error',
+        'emissor',
+        {
+          parameters: {
+            action: 'anoncreds_sign_failed',
+            errorMessage: error instanceof Error ? error.message : String(error),
+            errorName: error instanceof Error ? error.name : typeof error,
+          },
+          stack_trace: error instanceof Error ? error.stack : undefined,
+        },
+        false,
+        error instanceof Error ? error : new Error(String(error)),
+      );
       throw new CryptoError(
         'Failed to issue AnonCreds credential',
         'signature',
@@ -451,8 +487,21 @@ class CredentialService {
       let parsedToken: any = null;
       try {
         parsedToken = JSON.parse(token);
-      } catch {
-        // Not JSON, might be JWT
+      } catch (parseError) {
+        // Not JSON — treat as JWT. Log at debug level for troubleshooting.
+        this.logger.captureEvent(
+          'error',
+          'emissor',
+          {
+            parameters: {
+              action: 'credential_parse_attempt',
+              reason: 'Token is not valid JSON, trying JWT',
+              snippet: token.substring(0, 80),
+              parseError: parseError instanceof Error ? parseError.message : String(parseError),
+            },
+          },
+          true,
+        );
       }
 
       // Iterate through format registry (first match wins)
@@ -472,6 +521,21 @@ class CredentialService {
       if (error instanceof ValidationError) {
         throw error;
       }
+      this.logger.captureEvent(
+        'error',
+        'emissor',
+        {
+          parameters: {
+            action: 'credential_validation_failed',
+            errorMessage: error instanceof Error ? error.message : String(error),
+            errorName: error instanceof Error ? error.name : typeof error,
+            snippet: token.substring(0, 80),
+          },
+          stack_trace: error instanceof Error ? error.stack : undefined,
+        },
+        false,
+        error instanceof Error ? error : new Error(String(error)),
+      );
       throw new ValidationError(
         'Formato de credencial inválido',
         'token',
@@ -522,6 +586,21 @@ class CredentialService {
       if (error instanceof ValidationError) {
         throw error;
       }
+      this.logger.captureEvent(
+        'error',
+        'emissor',
+        {
+          parameters: {
+            action: 'sdjwt_decode_failed',
+            errorMessage: error instanceof Error ? error.message : String(error),
+            errorName: error instanceof Error ? error.name : typeof error,
+            snippet: jwt.substring(0, 80),
+          },
+          stack_trace: error instanceof Error ? error.stack : undefined,
+        },
+        false,
+        error instanceof Error ? error : new Error(String(error)),
+      );
       throw new ValidationError(
         'Erro ao decodificar SD-JWT',
         'jwt',
@@ -564,7 +643,20 @@ class CredentialService {
         } else if (key === 'acesso_laboratorios' || key === 'acesso_predios') {
           try {
             credentialSubject[key] = JSON.parse(raw);
-          } catch {
+          } catch (arrayParseError) {
+            this.logger.captureEvent(
+              'error',
+              'emissor',
+              {
+                parameters: {
+                  action: 'anoncreds_array_parse_failed',
+                  field: key,
+                  rawValue: raw.substring(0, 80),
+                  parseError: arrayParseError instanceof Error ? arrayParseError.message : String(arrayParseError),
+                },
+              },
+              false,
+            );
             credentialSubject[key] = [];
           }
         } else {
@@ -597,6 +689,21 @@ class CredentialService {
       if (error instanceof ValidationError) {
         throw error;
       }
+      this.logger.captureEvent(
+        'error',
+        'emissor',
+        {
+          parameters: {
+            action: 'anoncreds_decode_failed',
+            errorMessage: error instanceof Error ? error.message : String(error),
+            errorName: error instanceof Error ? error.name : typeof error,
+            snippet: anonCredsJson.substring(0, 80),
+          },
+          stack_trace: error instanceof Error ? error.stack : undefined,
+        },
+        false,
+        error instanceof Error ? error : new Error(String(error)),
+      );
       throw new ValidationError(
         'Erro ao decodificar AnonCreds',
         'anoncreds',

@@ -1,5 +1,6 @@
-import React, {useState} from 'react';
+import React, {useState, useCallback} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 import {LogEntry as LogEntryType} from '../types';
 import {getTheme, scaleFontSize, Theme} from '../utils/theme';
@@ -12,6 +13,31 @@ const LogEntry: React.FC<LogEntryProps> = ({log}) => {
   const theme = getTheme();
   const styles = createStyles(theme);
   const [expanded, setExpanded] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyEntry = useCallback(async () => {
+    const lines: string[] = [];
+    const ts = new Date(log.timestamp).toISOString();
+    lines.push(`[${ts}] ${log.operation} | ${log.module} | ${log.success ? 'OK' : 'FAIL'}`);
+    if (log.error) lines.push(`Error: ${log.error.message}`);
+    if (log.details) {
+      if (log.details.algorithm) lines.push(`Algorithm: ${log.details.algorithm}`);
+      if (log.details.did_method) lines.push(`DID Method: ${log.details.did_method}`);
+      if (log.details.format) lines.push(`Format: ${log.details.format}`);
+      if (log.details.parameters) {
+        for (const [k, v] of Object.entries(log.details.parameters)) {
+          const val = typeof v === 'object' ? JSON.stringify(v) : String(v);
+          lines.push(`${k}: ${val}`);
+        }
+      }
+      if (log.details.stack_trace) {
+        lines.push(`Stack Trace:\n  ${log.details.stack_trace.replace(/\n/g, '\n  ')}`);
+      }
+    }
+    await Clipboard.setStringAsync(lines.join('\n'));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [log]);
 
   const formatTimestamp = (date: Date): string => {
     return new Date(date).toLocaleString('pt-BR', {
@@ -186,6 +212,36 @@ const LogEntry: React.FC<LogEntryProps> = ({log}) => {
       )}
 
       {expanded && renderDetails()}
+
+      {expanded && (
+        <TouchableOpacity
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: theme.spacing.sm,
+            paddingVertical: theme.spacing.xs,
+            backgroundColor: theme.colors.background,
+            borderRadius: theme.borderRadius.small,
+          }}
+          onPress={handleCopyEntry}
+          accessibilityLabel="Copiar log para a área de transferência"
+          accessibilityRole="button">
+          <MaterialCommunityIcons
+            name={copied ? 'check' : 'content-copy'}
+            size={14}
+            color={theme.colors.primary}
+          />
+          <Text style={{
+            fontSize: scaleFontSize(12),
+            color: theme.colors.primary,
+            marginLeft: 4,
+            fontWeight: '600',
+          }}>
+            {copied ? 'Copiado!' : 'Copiar'}
+          </Text>
+        </TouchableOpacity>
+      )}
 
       <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: theme.spacing.sm}}>
         <MaterialCommunityIcons name={expanded ? 'chevron-up' : 'chevron-down'} size={14} color={theme.colors.textDisabled} />

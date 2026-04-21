@@ -56,9 +56,9 @@ jest.mock('./src/services/AgentService', () => {
       }),
     },
     wallet: {
-      sign: jest.fn().mockResolvedValue({
-        signature: Buffer.from('mock-ed25519-signature-value-padded-to-64-bytes-for-realism00000'),
-      }),
+      sign: jest.fn().mockResolvedValue(
+        Buffer.from('mock-ed25519-signature-value-padded-to-64-bytes-for-realism00000'),
+      ),
     },
     modules: {
       anoncreds: {},

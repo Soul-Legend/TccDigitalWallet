@@ -101,8 +101,22 @@ export function useIssuerState() {
     try {
       const issuers = await TrustChainService.getAllIssuers();
       setTrustedIssuers(issuers);
-    } catch {}
-  }, []);
+    } catch (err) {
+      addLog({
+        operation: 'error',
+        module: Module.ISSUER,
+        details: {
+          parameters: {
+            action: 'load_trust_chain_failed',
+            errorMessage: err instanceof Error ? err.message : String(err),
+          },
+          stack_trace: err instanceof Error ? err.stack : undefined,
+        },
+        success: false,
+        error: err instanceof Error ? err : new Error(String(err)),
+      });
+    }
+  }, [addLog]);
 
   useEffect(() => {
     loadTrustChain();
@@ -125,9 +139,22 @@ export function useIssuerState() {
         success: true,
       });
     } catch (err) {
-      setGeneralError(
-        `Erro ao inicializar âncora: ${err instanceof Error ? err.message : String(err)}`,
-      );
+      const errMsg = err instanceof Error ? err.message : String(err);
+      setGeneralError(`Erro ao inicializar âncora: ${errMsg}`);
+      addLog({
+        operation: 'error',
+        module: Module.ISSUER,
+        details: {
+          parameters: {
+            action: 'trust_chain_init_failed',
+            errorMessage: errMsg,
+            errorName: err instanceof Error ? err.name : typeof err,
+          },
+          stack_trace: err instanceof Error ? err.stack : undefined,
+        },
+        success: false,
+        error: err instanceof Error ? err : new Error(String(err)),
+      });
     } finally {
       setIsChainLoading(false);
     }
@@ -176,9 +203,24 @@ export function useIssuerState() {
         success: true,
       });
     } catch (err) {
-      setGeneralError(
-        `Erro ao registrar emissor: ${err instanceof Error ? err.message : String(err)}`,
-      );
+      const errMsg = err instanceof Error ? err.message : String(err);
+      setGeneralError(`Erro ao registrar emissor: ${errMsg}`);
+      addLog({
+        operation: 'error',
+        module: Module.ISSUER,
+        details: {
+          parameters: {
+            action: 'trust_chain_register_failed',
+            errorMessage: errMsg,
+            errorName: err instanceof Error ? err.name : typeof err,
+            childDid: childDid.trim(),
+            childName: childName.trim(),
+          },
+          stack_trace: err instanceof Error ? err.stack : undefined,
+        },
+        success: false,
+        error: err instanceof Error ? err : new Error(String(err)),
+      });
     } finally {
       setIsChainLoading(false);
     }

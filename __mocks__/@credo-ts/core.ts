@@ -3,9 +3,9 @@
  * Used in tests to simulate Credo functionality without native modules
  */
 
-const mockSign = jest.fn().mockResolvedValue({
-  signature: Buffer.from('mock-signature'),
-});
+const mockSign = jest.fn().mockResolvedValue(
+  Buffer.from('mock-signature'),
+);
 
 const mockDidsCreate = jest.fn().mockResolvedValue({
   didState: {
@@ -71,3 +71,14 @@ export const LogLevel = {
 
 export const DidKey = jest.fn();
 export const DidPeer = jest.fn();
+
+/**
+ * Mock for getKeyFromVerificationMethod — returns a minimal Key-like object
+ * that the wallet can use to look up the signing key.
+ */
+export const getKeyFromVerificationMethod = jest.fn().mockImplementation(
+  (vm: {publicKey?: Buffer}) => ({
+    publicKey: vm.publicKey ?? Buffer.from('mock-public-key'),
+    keyType: 'ed25519',
+  }),
+);

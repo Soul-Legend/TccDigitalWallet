@@ -8,6 +8,7 @@ import {
   Alert,
   RefreshControl,
 } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 import {useAppStore} from '../stores/useAppStore';
 import LogEntry from '../components/LogEntry';
@@ -59,6 +60,25 @@ const createStyles = (theme: Theme) =>
       fontSize: scaleFontSize(theme.typography.fontSizeSmall),
       fontWeight: '600',
     },
+    copyErrorsButton: {
+      backgroundColor: theme.colors.primary,
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.sm,
+      borderRadius: theme.borderRadius.small,
+      flexDirection: 'row' as const,
+      alignItems: 'center' as const,
+      marginRight: theme.spacing.sm,
+    },
+    copyErrorsButtonText: {
+      color: theme.colors.surface,
+      fontSize: scaleFontSize(theme.typography.fontSizeSmall),
+      fontWeight: '600',
+      marginLeft: 4,
+    },
+    headerButtons: {
+      flexDirection: 'row' as const,
+      alignItems: 'center' as const,
+    },
     emptyContainer: {
       flex: 1,
       justifyContent: 'center',
@@ -96,6 +116,47 @@ const LogsScreen: React.FC = () => {
   const theme = getTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const [refreshing, setRefreshing] = useState(false);
+  const [copyFeedback, setCopyFeedback] = useState(false);
+
+  /** Serialize a log entry to a readable string for clipboard. */
+  const serializeLog = useCallback((log: LogEntryType): string => {
+    const lines: string[] = [];
+    const ts = new Date(log.timestamp).toISOString();
+    lines.push(`[${ts}] ${log.operation} | ${log.module} | ${log.success ? 'OK' : 'FAIL'}`);
+    if (log.error) {
+      lines.push(`  Error: ${log.error.message}`);
+    }
+    if (log.details) {
+      if (log.details.algorithm) lines.push(`  Algorithm: ${log.details.algorithm}`);
+      if (log.details.did_method) lines.push(`  DID Method: ${log.details.did_method}`);
+      if (log.details.format) lines.push(`  Format: ${log.details.format}`);
+      if (log.details.parameters) {
+        for (const [k, v] of Object.entries(log.details.parameters)) {
+          const val = typeof v === 'object' ? JSON.stringify(v) : String(v);
+          lines.push(`  ${k}: ${val}`);
+        }
+      }
+      if (log.details.stack_trace) {
+        lines.push(`  Stack Trace:\n    ${log.details.stack_trace.replace(/\n/g, '\n    ')}`);
+      }
+    }
+    return lines.join('\n');
+  }, []);
+
+  const handleCopyErrors = useCallback(async () => {
+    const errors = logs.filter(l => !l.success);
+    if (errors.length === 0) {
+      Alert.alert('Nenhum erro', 'Não há erros para copiar.');
+      return;
+    }
+    const sorted = [...errors].sort(
+      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+    );
+    const text = sorted.map(serializeLog).join('\n\n---\n\n');
+    await Clipboard.setStringAsync(text);
+    setCopyFeedback(true);
+    setTimeout(() => setCopyFeedback(false), 2000);
+  }, [logs, serializeLog]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -149,13 +210,25 @@ const LogsScreen: React.FC = () => {
             Total de eventos: {logs.length}
           </Text>
           {logs.length > 0 && (
-            <TouchableOpacity
-              style={styles.clearButton}
-              onPress={handleClearLogs}
-              accessibilityLabel="Limpar histórico de logs"
-              accessibilityRole="button">
-              <Text style={styles.clearButtonText}>Limpar Histórico</Text>
-            </TouchableOpacity>
+            <View style={styles.headerButtons}>
+              <TouchableOpacity
+                style={styles.copyErrorsButton}
+                onPress={handleCopyErrors}
+                accessibilityLabel="Copiar erros para a área de transferência"
+                accessibilityRole="button">
+                <MaterialCommunityIcons name={copyFeedback ? 'check' : 'content-copy'} size={14} color={theme.colors.surface} />
+                <Text style={styles.copyErrorsButtonText}>
+                  {copyFeedback ? 'Copiado!' : 'Copiar Erros'}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.clearButton}
+                onPress={handleClearLogs}
+                accessibilityLabel="Limpar histórico de logs"
+                accessibilityRole="button">
+                <Text style={styles.clearButtonText}>Limpar Histórico</Text>
+              </TouchableOpacity>
+            </View>
           )}
         </View>
       </View>
