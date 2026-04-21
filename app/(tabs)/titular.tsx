@@ -1,1 +1,1 @@
-export {default} from '../src/screens/HolderScreen';
+export {default} from '../../src/screens/HolderScreen';

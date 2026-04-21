@@ -1,1 +1,1 @@
-export {default} from '../src/screens/IssuerScreen';
+export {default} from '../../src/screens/IssuerScreen';

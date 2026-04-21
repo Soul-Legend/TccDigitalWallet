@@ -1,1 +1,1 @@
-export {default} from '../src/screens/VerifierScreen';
+export {default} from '../../src/screens/VerifierScreen';

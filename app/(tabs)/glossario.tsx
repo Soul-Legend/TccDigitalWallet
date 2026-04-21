@@ -1,1 +1,1 @@
-export {default} from '../src/screens/GlossaryScreen';
+export {default} from '../../src/screens/GlossaryScreen';

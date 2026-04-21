@@ -1,1 +1,1 @@
-export {default} from '../src/screens/LogsScreen';
+export {default} from '../../src/screens/LogsScreen';
