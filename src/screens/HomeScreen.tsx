@@ -6,14 +6,66 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
 import {useRouter} from 'expo-router';
 import {useAppStore} from '../stores/useAppStore';
 import {AppModule, AppModuleType} from '../utils/constants';
 import {Routes} from '../utils/routes';
+import {getTheme, scaleFontSize, accessibleColors, Theme} from '../utils/theme';
+
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    header: {
+      backgroundColor: theme.colors.primary,
+      padding: theme.spacing.md + theme.spacing.xs,
+      alignItems: 'center',
+    },
+    title: {
+      fontSize: scaleFontSize(theme.typography.fontSizeTitle),
+      fontWeight: 'bold',
+      color: accessibleColors.textOnDark,
+      marginBottom: theme.spacing.sm,
+    },
+    subtitle: {
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      color: accessibleColors.secondaryTextOnDark,
+      textAlign: 'center',
+    },
+    modulesContainer: {
+      padding: theme.spacing.md,
+    },
+    moduleCard: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borderRadius.medium,
+      padding: theme.spacing.md + theme.spacing.xs,
+      marginBottom: theme.spacing.md,
+      ...(theme.shadows.medium as object),
+      minHeight: 44, // Minimum touch target
+    },
+    moduleIcon: {
+      marginBottom: theme.spacing.sm + theme.spacing.xs,
+    },
+    moduleName: {
+      fontSize: scaleFontSize(theme.typography.fontSizeXLarge),
+      fontWeight: 'bold',
+      color: theme.colors.primary,
+      marginBottom: theme.spacing.sm,
+    },
+    moduleDescription: {
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      color: theme.colors.textSecondary,
+    },
+  });
 
 const HomeScreen: React.FC = () => {
   const router = useRouter();
   const setCurrentModule = useAppStore(state => state.setCurrentModule);
+  const theme = getTheme();
+  const styles = createStyles(theme);
 
   useEffect(() => {
     setCurrentModule(AppModule.HOME);
@@ -24,35 +76,35 @@ const HomeScreen: React.FC = () => {
       description: 'Emitir credenciais acadêmicas verificáveis',
       route: 'Emissor' as const,
       path: Routes.Emissor,
-      icon: '📝',
+      icon: 'file-document-edit' as const,
     },
     {
       name: 'Titular',
       description: 'Gerenciar e apresentar credenciais',
       route: 'Titular' as const,
       path: Routes.Titular,
-      icon: '👤',
+      icon: 'account' as const,
     },
     {
       name: 'Verificador',
       description: 'Validar apresentações verificáveis',
       route: 'Verificador' as const,
       path: Routes.Verificador,
-      icon: '✓',
+      icon: 'check-circle' as const,
     },
     {
       name: 'Logs',
       description: 'Monitorar eventos criptográficos',
       route: 'Logs' as const,
       path: Routes.Logs,
-      icon: '📊',
+      icon: 'chart-bar' as const,
     },
     {
       name: 'Glossário',
       description: 'Termos e definições SSI',
       route: 'Glossario' as const,
       path: Routes.Glossario,
-      icon: '📖',
+      icon: 'book-open-variant' as const,
     },
   ];
 
@@ -80,7 +132,9 @@ const HomeScreen: React.FC = () => {
             accessibilityLabel={`Módulo ${module.name}`}
             accessibilityHint={module.description}
             accessibilityRole="button">
-            <Text style={styles.moduleIcon} accessible={false}>{module.icon}</Text>
+            <View style={styles.moduleIcon} accessible={false}>
+              <MaterialCommunityIcons name={module.icon} size={32} color={theme.colors.primary} />
+            </View>
             <Text style={styles.moduleName}>{module.name}</Text>
             <Text style={styles.moduleDescription}>{module.description}</Text>
           </TouchableOpacity>
@@ -89,57 +143,5 @@ const HomeScreen: React.FC = () => {
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    backgroundColor: '#003366',
-    padding: 20,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#ccc',
-    textAlign: 'center',
-  },
-  modulesContainer: {
-    padding: 16,
-  },
-  moduleCard: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 20,
-    marginBottom: 16,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    minHeight: 44, // Minimum touch target
-  },
-  moduleIcon: {
-    fontSize: 40,
-    marginBottom: 12,
-  },
-  moduleName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#003366',
-    marginBottom: 8,
-  },
-  moduleDescription: {
-    fontSize: 14,
-    color: '#666',
-  },
-});
 
 export default HomeScreen;

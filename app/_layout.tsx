@@ -17,8 +17,9 @@ export default function RootLayout(): React.JSX.Element {
           headerStyle: {backgroundColor: '#003366'},
           headerTintColor: '#fff',
           headerTitleStyle: {fontWeight: 'bold'},
+          animation: 'slide_from_right',
         }}>
-        <Stack.Screen name="index" options={{headerShown: false}} />
+        <Stack.Screen name="index" options={{headerShown: false, animation: 'fade'}} />
         <Stack.Screen
           name="home"
           options={{title: 'Carteira Identidade Acadêmica'}}

@@ -7,14 +7,21 @@ import {
   TextInput,
   TouchableOpacity,
   Switch,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import LoadingIndicator from '../components/LoadingIndicator';
 import SuccessMessage from '../components/SuccessMessage';
 import ErrorMessage from '../components/ErrorMessage';
 import TrustChainSection from '../components/TrustChainSection';
 import {useIssuerState} from './hooks/useIssuerState';
+import {getTheme, scaleFontSize} from '../utils/theme';
+import type {Theme} from '../utils/theme';
 
 const IssuerScreen: React.FC = () => {
+  const theme = getTheme();
+  const styles = createStyles(theme);
+
   const {
     formData,
     updateField,
@@ -42,7 +49,8 @@ const IssuerScreen: React.FC = () => {
   } = useIssuerState();
 
   return (
-    <ScrollView style={styles.container}>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{flex: 1}}>
+    <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
       <View style={styles.content}>
         <Text style={styles.title}>Módulo Emissor</Text>
         <Text style={styles.subtitle}>
@@ -134,6 +142,7 @@ const IssuerScreen: React.FC = () => {
               }
               placeholder="Digite o nome completo"
               editable={!isLoading}
+              accessibilityLabel="Nome completo do estudante"
             />
             {errors.nome_completo && (
               <Text style={styles.errorText}>{errors.nome_completo}</Text>
@@ -149,6 +158,7 @@ const IssuerScreen: React.FC = () => {
               placeholder="Digite o CPF (11 dígitos)"
               keyboardType="numeric"
               editable={!isLoading}
+              accessibilityLabel="CPF do estudante"
             />
             {errors.cpf && <Text style={styles.errorText}>{errors.cpf}</Text>}
           </View>
@@ -163,6 +173,7 @@ const IssuerScreen: React.FC = () => {
               }
               placeholder="Digite a matrícula"
               editable={!isLoading}
+              accessibilityLabel="Matrícula do estudante"
             />
             {errors.matricula && (
               <Text style={styles.errorText}>{errors.matricula}</Text>
@@ -177,6 +188,7 @@ const IssuerScreen: React.FC = () => {
               onChangeText={text => updateField('curso', text)}
               placeholder="Digite o curso"
               editable={!isLoading}
+              accessibilityLabel="Curso do estudante"
             />
             {errors.curso && (
               <Text style={styles.errorText}>{errors.curso}</Text>
@@ -243,6 +255,7 @@ const IssuerScreen: React.FC = () => {
               }
               placeholder="AAAA-MM-DD"
               editable={!isLoading}
+              accessibilityLabel="Data de nascimento do estudante"
             />
             {errors.data_nascimento && (
               <Text style={styles.errorText}>{errors.data_nascimento}</Text>
@@ -262,6 +275,8 @@ const IssuerScreen: React.FC = () => {
                 updateField('alojamento_indigena', value)
               }
               disabled={isLoading}
+              accessibilityLabel="Alojamento Indígena"
+              accessibilityRole="switch"
             />
           </View>
 
@@ -273,6 +288,8 @@ const IssuerScreen: React.FC = () => {
                 updateField('auxilio_creche', value)
               }
               disabled={isLoading}
+              accessibilityLabel="Auxílio Creche"
+              accessibilityRole="switch"
             />
           </View>
 
@@ -284,6 +301,8 @@ const IssuerScreen: React.FC = () => {
                 updateField('auxilio_moradia', value)
               }
               disabled={isLoading}
+              accessibilityLabel="Auxílio Moradia"
+              accessibilityRole="switch"
             />
           </View>
 
@@ -295,6 +314,8 @@ const IssuerScreen: React.FC = () => {
                 updateField('bolsa_estudantil', value)
               }
               disabled={isLoading}
+              accessibilityLabel="Bolsa Estudantil"
+              accessibilityRole="switch"
             />
           </View>
 
@@ -306,6 +327,8 @@ const IssuerScreen: React.FC = () => {
                 updateField('bolsa_permanencia_mec', value)
               }
               disabled={isLoading}
+              accessibilityLabel="Bolsa Permanência MEC"
+              accessibilityRole="switch"
             />
           </View>
 
@@ -315,6 +338,8 @@ const IssuerScreen: React.FC = () => {
               value={formData.paiq}
               onValueChange={value => updateField('paiq', value)}
               disabled={isLoading}
+              accessibilityLabel="PAIQ"
+              accessibilityRole="switch"
             />
           </View>
 
@@ -326,6 +351,8 @@ const IssuerScreen: React.FC = () => {
                 updateField('moradia_estudantil', value)
               }
               disabled={isLoading}
+              accessibilityLabel="Moradia Estudantil"
+              accessibilityRole="switch"
             />
           </View>
 
@@ -337,6 +364,8 @@ const IssuerScreen: React.FC = () => {
                 updateField('isencao_ru', value)
               }
               disabled={isLoading}
+              accessibilityLabel="Isenção RU"
+              accessibilityRole="switch"
             />
           </View>
 
@@ -348,6 +377,8 @@ const IssuerScreen: React.FC = () => {
                 updateField('isencao_esporte', value)
               }
               disabled={isLoading}
+              accessibilityLabel="Isenção Esporte"
+              accessibilityRole="switch"
             />
           </View>
 
@@ -359,6 +390,8 @@ const IssuerScreen: React.FC = () => {
                 updateField('isencao_idiomas', value)
               }
               disabled={isLoading}
+              accessibilityLabel="Isenção Idiomas"
+              accessibilityRole="switch"
             />
           </View>
         </View>
@@ -378,136 +411,139 @@ const IssuerScreen: React.FC = () => {
         </View>
       </View>
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  content: {
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#003366',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 20,
-  },
-  section: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#003366',
-    marginBottom: 16,
-  },
-  fieldContainer: {
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 4,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: '#fff',
-  },
-  inputError: {
-    borderColor: '#c62828',
-  },
-  errorText: {
-    fontSize: 12,
-    color: '#c62828',
-    marginTop: 4,
-  },
-  statusContainer: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  statusButton: {
-    flex: 1,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 4,
-    alignItems: 'center',
-  },
-  statusButtonActive: {
-    backgroundColor: '#003366',
-    borderColor: '#003366',
-  },
-  statusButtonText: {
-    fontSize: 16,
-    color: '#666',
-  },
-  statusButtonTextActive: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  switchContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  switchLabel: {
-    fontSize: 16,
-    color: '#333',
-  },
-  buttonContainer: {
-    marginTop: 8,
-    marginBottom: 32,
-  },
-  issueButton: {
-    backgroundColor: '#003366',
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  issueButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  credentialToken: {
-    fontSize: 12,
-    fontFamily: 'monospace',
-    color: '#333',
-    backgroundColor: '#f0f0f0',
-    padding: 12,
-    borderRadius: 4,
-    marginBottom: 12,
-  },
-  copyButton: {
-    backgroundColor: '#4CAF50',
-    padding: 12,
-    borderRadius: 6,
-    alignItems: 'center',
-  },
-  copyButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    content: {
+      padding: theme.spacing.lg,
+    },
+    title: {
+      fontSize: scaleFontSize(theme.typography.fontSizeTitle),
+      fontWeight: 'bold',
+      color: theme.colors.primary,
+      marginBottom: theme.spacing.sm,
+    },
+    subtitle: {
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      color: theme.colors.textSecondary,
+      marginBottom: theme.spacing.lg,
+    },
+    section: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borderRadius.medium,
+      padding: theme.spacing.md,
+      marginBottom: theme.spacing.md,
+      ...(theme.shadows.small as any),
+    },
+    sectionTitle: {
+      fontSize: scaleFontSize(18),
+      fontWeight: 'bold',
+      color: theme.colors.primary,
+      marginBottom: theme.spacing.md,
+    },
+    fieldContainer: {
+      marginBottom: theme.spacing.md,
+    },
+    label: {
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      fontWeight: '600',
+      color: theme.colors.text,
+      marginBottom: theme.spacing.sm,
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: theme.borderRadius.small,
+      padding: theme.spacing.sm + theme.spacing.xs,
+      fontSize: scaleFontSize(theme.typography.fontSizeLarge),
+      backgroundColor: theme.colors.surface,
+    },
+    inputError: {
+      borderColor: theme.colors.error,
+    },
+    errorText: {
+      fontSize: scaleFontSize(theme.typography.fontSizeSmall),
+      color: theme.colors.error,
+      marginTop: theme.spacing.xs,
+    },
+    statusContainer: {
+      flexDirection: 'row',
+      gap: theme.spacing.sm + theme.spacing.xs,
+    },
+    statusButton: {
+      flex: 1,
+      padding: theme.spacing.sm + theme.spacing.xs,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: theme.borderRadius.small,
+      alignItems: 'center',
+    },
+    statusButtonActive: {
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
+    },
+    statusButtonText: {
+      fontSize: scaleFontSize(theme.typography.fontSizeLarge),
+      color: theme.colors.textSecondary,
+    },
+    statusButtonTextActive: {
+      color: theme.colors.surface,
+      fontWeight: 'bold',
+    },
+    switchContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: theme.spacing.sm + theme.spacing.xs,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.divider,
+    },
+    switchLabel: {
+      fontSize: scaleFontSize(theme.typography.fontSizeLarge),
+      color: theme.colors.text,
+    },
+    buttonContainer: {
+      marginTop: theme.spacing.sm,
+      marginBottom: theme.spacing.xl,
+    },
+    issueButton: {
+      backgroundColor: theme.colors.primary,
+      padding: theme.spacing.md,
+      borderRadius: theme.borderRadius.medium,
+      alignItems: 'center',
+    },
+    issueButtonText: {
+      color: theme.colors.surface,
+      fontSize: scaleFontSize(18),
+      fontWeight: 'bold',
+    },
+    credentialToken: {
+      fontSize: scaleFontSize(theme.typography.fontSizeSmall),
+      fontFamily: 'monospace',
+      color: theme.colors.text,
+      backgroundColor: theme.colors.background,
+      padding: theme.spacing.sm + theme.spacing.xs,
+      borderRadius: theme.borderRadius.small,
+      marginBottom: theme.spacing.sm + theme.spacing.xs,
+    },
+    copyButton: {
+      backgroundColor: theme.colors.success,
+      padding: theme.spacing.sm + theme.spacing.xs,
+      borderRadius: theme.borderRadius.medium,
+      alignItems: 'center',
+    },
+    copyButtonText: {
+      color: theme.colors.surface,
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      fontWeight: '600',
+    },
+  });
 
 export default IssuerScreen;

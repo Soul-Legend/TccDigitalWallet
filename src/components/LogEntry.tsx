@@ -1,12 +1,16 @@
 import React, {useState} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
 import {LogEntry as LogEntryType} from '../types';
+import {getTheme, scaleFontSize, Theme} from '../utils/theme';
 
 interface LogEntryProps {
   log: LogEntryType;
 }
 
 const LogEntry: React.FC<LogEntryProps> = ({log}) => {
+  const theme = getTheme();
+  const styles = createStyles(theme);
   const [expanded, setExpanded] = useState(false);
 
   const formatTimestamp = (date: Date): string => {
@@ -165,13 +169,11 @@ const LogEntry: React.FC<LogEntryProps> = ({log}) => {
           <Text style={styles.moduleText}>{getModuleLabel(log.module)}</Text>
         </View>
         <View style={styles.headerRight}>
-          <Text
-            style={[
-              styles.statusBadge,
-              log.success ? styles.successBadge : styles.errorBadge,
-            ]}>
-            {log.success ? '✓' : '✗'}
-          </Text>
+          <MaterialCommunityIcons
+            name={log.success ? 'check-circle' : 'close-circle'}
+            size={20}
+            color={log.success ? theme.colors.success : theme.colors.error}
+          />
         </View>
       </View>
 
@@ -185,37 +187,36 @@ const LogEntry: React.FC<LogEntryProps> = ({log}) => {
 
       {expanded && renderDetails()}
 
-      <Text style={styles.expandHint}>
-        {expanded ? '▲ Toque para recolher' : '▼ Toque para expandir'}
-      </Text>
+      <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: theme.spacing.sm}}>
+        <MaterialCommunityIcons name={expanded ? 'chevron-up' : 'chevron-down'} size={14} color={theme.colors.textDisabled} />
+        <Text style={[styles.expandHint, {marginTop: 0}]}>
+          {expanded ? ' Toque para recolher' : ' Toque para expandir'}
+        </Text>
+      </View>
     </TouchableOpacity>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    padding: 16,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.medium,
+    padding: theme.spacing.md,
     marginVertical: 6,
     marginHorizontal: 12,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    ...(theme.shadows.medium as any),
     borderLeftWidth: 4,
-    borderLeftColor: '#4caf50',
+    borderLeftColor: theme.colors.success,
   },
   errorContainer: {
-    borderLeftColor: '#f44336',
-    backgroundColor: '#ffebee',
+    borderLeftColor: theme.colors.error,
+    backgroundColor: theme.colors.errorLight,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: theme.spacing.sm,
   },
   headerLeft: {
     flex: 1,
@@ -224,108 +225,108 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   operationText: {
-    fontSize: 16,
+    fontSize: scaleFontSize(16),
     fontWeight: 'bold',
-    color: '#003366',
-    marginBottom: 4,
+    color: theme.colors.primary,
+    marginBottom: theme.spacing.xs,
   },
   moduleText: {
-    fontSize: 13,
-    color: '#666',
+    fontSize: scaleFontSize(13),
+    color: theme.colors.textSecondary,
   },
   timestamp: {
-    fontSize: 12,
-    color: '#999',
-    marginBottom: 8,
+    fontSize: scaleFontSize(12),
+    color: theme.colors.textDisabled,
+    marginBottom: theme.spacing.sm,
   },
   statusBadge: {
-    fontSize: 20,
+    fontSize: scaleFontSize(20),
     fontWeight: 'bold',
   },
   successBadge: {
-    color: '#4caf50',
+    color: theme.colors.success,
   },
   errorBadge: {
-    color: '#f44336',
+    color: theme.colors.error,
   },
   errorMessageContainer: {
-    backgroundColor: '#ffcdd2',
-    padding: 8,
-    borderRadius: 4,
-    marginVertical: 8,
+    backgroundColor: theme.colors.errorLight,
+    padding: theme.spacing.sm,
+    borderRadius: theme.borderRadius.small,
+    marginVertical: theme.spacing.sm,
   },
   errorMessage: {
-    fontSize: 13,
-    color: '#c62828',
+    fontSize: scaleFontSize(13),
+    color: theme.colors.error,
     fontWeight: '500',
   },
   detailsContainer: {
     marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: theme.colors.divider,
   },
   detailRow: {
     marginBottom: 10,
   },
   detailLabel: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 4,
+    fontSize: scaleFontSize(12),
+    color: theme.colors.textSecondary,
+    marginBottom: theme.spacing.xs,
     fontWeight: '600',
   },
   detailValue: {
-    fontSize: 14,
-    color: '#333',
+    fontSize: scaleFontSize(14),
+    color: theme.colors.text,
   },
   detailValueMono: {
-    fontSize: 13,
-    color: '#333',
+    fontSize: scaleFontSize(13),
+    color: theme.colors.text,
     fontFamily: 'monospace',
   },
   successText: {
-    color: '#2e7d32',
+    color: theme.colors.success,
     fontWeight: 'bold',
   },
   errorText: {
-    color: '#c62828',
+    color: theme.colors.error,
     fontWeight: 'bold',
   },
   parametersContainer: {
-    backgroundColor: '#f5f5f5',
-    padding: 8,
-    borderRadius: 4,
-    marginTop: 4,
+    backgroundColor: theme.colors.background,
+    padding: theme.spacing.sm,
+    borderRadius: theme.borderRadius.small,
+    marginTop: theme.spacing.xs,
   },
   parameterRow: {
     flexDirection: 'row',
-    marginBottom: 4,
+    marginBottom: theme.spacing.xs,
   },
   parameterKey: {
-    fontSize: 12,
-    color: '#666',
+    fontSize: scaleFontSize(12),
+    color: theme.colors.textSecondary,
     fontWeight: '600',
-    marginRight: 8,
+    marginRight: theme.spacing.sm,
   },
   parameterValue: {
-    fontSize: 12,
-    color: '#333',
+    fontSize: scaleFontSize(12),
+    color: theme.colors.text,
     flex: 1,
   },
   stackTrace: {
-    fontSize: 11,
-    color: '#666',
+    fontSize: scaleFontSize(11),
+    color: theme.colors.textSecondary,
     fontFamily: 'monospace',
-    backgroundColor: '#f5f5f5',
-    padding: 8,
-    borderRadius: 4,
-    marginTop: 4,
+    backgroundColor: theme.colors.background,
+    padding: theme.spacing.sm,
+    borderRadius: theme.borderRadius.small,
+    marginTop: theme.spacing.xs,
   },
   expandHint: {
-    fontSize: 11,
-    color: '#999',
+    fontSize: scaleFontSize(11),
+    color: theme.colors.textDisabled,
     textAlign: 'center',
-    marginTop: 8,
+    marginTop: theme.spacing.sm,
   },
 });
 

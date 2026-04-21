@@ -1,6 +1,7 @@
 import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {formatAttributeName} from '../utils/formatters';
+import {getTheme, scaleFontSize, Theme} from '../utils/theme';
 
 interface AttributeSelectorProps {
   attributes: string[];
@@ -23,7 +24,8 @@ const AttributeSelector: React.FC<AttributeSelectorProps> = ({
   onToggle,
   disabled = false,
 }) => {
-
+  const theme = getTheme();
+  const styles = createStyles(theme);
 
   if (attributes.length === 0) {
     return (
@@ -54,7 +56,9 @@ const AttributeSelector: React.FC<AttributeSelectorProps> = ({
                 disabled && styles.disabledItem,
               ]}
               onPress={() => !disabled && onToggle(attr)}
-              disabled={disabled}>
+              disabled={disabled}
+              accessibilityLabel={`${formatAttributeName(attr)}${isSelected ? ', selecionado' : ', não selecionado'}`}
+              accessibilityRole="checkbox">
               <View style={styles.checkbox}>
                 <Text
                   style={[
@@ -86,39 +90,39 @@ const AttributeSelector: React.FC<AttributeSelectorProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    padding: 16,
-    marginVertical: 8,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.medium,
+    padding: theme.spacing.md,
+    marginVertical: theme.spacing.sm,
   },
   title: {
-    fontSize: 16,
+    fontSize: scaleFontSize(16),
     fontWeight: 'bold',
-    color: '#003366',
-    marginBottom: 4,
+    color: theme.colors.primary,
+    marginBottom: theme.spacing.xs,
   },
   subtitle: {
-    fontSize: 13,
-    color: '#666',
-    marginBottom: 16,
+    fontSize: scaleFontSize(13),
+    color: theme.colors.textSecondary,
+    marginBottom: theme.spacing.md,
   },
   attributeList: {
-    gap: 8,
+    gap: theme.spacing.sm,
   },
   attributeItem: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 12,
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.borderRadius.medium,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: theme.colors.divider,
   },
   selectedItem: {
-    backgroundColor: '#e3f2fd',
-    borderColor: '#2196f3',
+    backgroundColor: theme.colors.background,
+    borderColor: theme.colors.secondary,
   },
   disabledItem: {
     opacity: 0.5,
@@ -129,43 +133,43 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   checkboxIcon: {
-    fontSize: 20,
-    color: '#666',
+    fontSize: scaleFontSize(20),
+    color: theme.colors.textSecondary,
   },
   checkboxIconSelected: {
-    color: '#2196f3',
+    color: theme.colors.secondary,
   },
   attributeText: {
-    fontSize: 15,
-    color: '#333',
+    fontSize: scaleFontSize(15),
+    color: theme.colors.text,
     flex: 1,
   },
   selectedText: {
-    color: '#1976d2',
+    color: theme.colors.secondary,
     fontWeight: '500',
   },
   disabledText: {
-    color: '#999',
+    color: theme.colors.textDisabled,
   },
   summary: {
-    marginTop: 16,
-    paddingTop: 16,
+    marginTop: theme.spacing.md,
+    paddingTop: theme.spacing.md,
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: theme.colors.divider,
   },
   summaryText: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: scaleFontSize(14),
+    color: theme.colors.textSecondary,
     textAlign: 'center',
     fontWeight: '500',
   },
   emptyState: {
-    padding: 24,
+    padding: theme.spacing.lg,
     alignItems: 'center',
   },
   emptyStateText: {
-    fontSize: 14,
-    color: '#999',
+    fontSize: scaleFontSize(14),
+    color: theme.colors.textDisabled,
     fontStyle: 'italic',
   },
 });

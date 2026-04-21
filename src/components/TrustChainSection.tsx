@@ -1,6 +1,8 @@
 import React from 'react';
 import {View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity} from 'react-native';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
 import {TrustedIssuer} from '../types';
+import {getTheme, scaleFontSize, Theme} from '../utils/theme';
 
 interface TrustChainSectionProps {
   expanded: boolean;
@@ -31,12 +33,23 @@ const TrustChainSection: React.FC<TrustChainSectionProps> = ({
   onInitializeRoot,
   onRegisterChild,
 }) => {
+  const theme = getTheme();
+  const styles = createStyles(theme);
+
   return (
     <View style={styles.section}>
-      <TouchableOpacity style={styles.chainHeader} onPress={onToggleExpanded}>
-        <Text style={styles.sectionTitle}>
-          🔗 Cadeia de Confiança {expanded ? '▼' : '▶'}
-        </Text>
+      <TouchableOpacity
+        style={styles.chainHeader}
+        onPress={onToggleExpanded}
+        accessibilityLabel={`Cadeia de Confian\u00e7a, ${expanded ? 'expandido' : 'recolhido'}. ${trustedIssuers.length} emissores`}
+        accessibilityRole="button">
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <MaterialCommunityIcons name="link-variant" size={18} color={theme.colors.primary} />
+          <Text style={[styles.sectionTitle, {marginLeft: 6, marginBottom: 0}]}>
+            Cadeia de Confiança
+          </Text>
+          <MaterialCommunityIcons name={expanded ? 'chevron-down' : 'chevron-right'} size={18} color={theme.colors.primary} style={{marginLeft: 4}} />
+        </View>
         <Text style={styles.chainBadge}>
           {trustedIssuers.length} emissor(es)
         </Text>
@@ -52,7 +65,9 @@ const TrustChainSection: React.FC<TrustChainSectionProps> = ({
               <TouchableOpacity
                 style={styles.chainButton}
                 onPress={onInitializeRoot}
-                disabled={isChainLoading}>
+                disabled={isChainLoading}
+                accessibilityLabel="Inicializar \u00e2ncora raiz da cadeia de confian\u00e7a"
+                accessibilityRole="button">
                 <Text style={styles.chainButtonText}>
                   {isChainLoading ? 'Inicializando...' : 'Inicializar Âncora Raiz'}
                 </Text>
@@ -71,7 +86,7 @@ const TrustChainSection: React.FC<TrustChainSectionProps> = ({
                     ]}>
                     <View style={styles.chainIssuerHeader}>
                       <Text style={styles.chainIssuerIcon}>
-                        {issuer.parentDid === null ? '🏛️' : '🏢'}
+                        <MaterialCommunityIcons name={issuer.parentDid === null ? 'bank' : 'office-building'} size={20} color={theme.colors.primary} />
                       </Text>
                       <View style={styles.chainIssuerInfo}>
                         <Text style={styles.chainIssuerName}>
@@ -116,14 +131,16 @@ const TrustChainSection: React.FC<TrustChainSectionProps> = ({
                       ]}
                       onPress={() => onSelectParent(
                         selectedParentDid === issuer.did ? null : issuer.did,
-                      )}>
+                      )}
+                      accessibilityLabel={`Emissor pai: ${issuer.name}${selectedParentDid === issuer.did ? ', selecionado' : ''}`}
+                      accessibilityRole="button">
                       <Text
                         style={[
                           styles.parentChipText,
                           selectedParentDid === issuer.did && styles.parentChipTextSelected,
                         ]}
                         numberOfLines={1}>
-                        {issuer.parentDid === null ? '🏛️ ' : '🏢 '}
+                        <MaterialCommunityIcons name={issuer.parentDid === null ? 'bank' : 'office-building'} size={14} color={selectedParentDid === issuer.did ? theme.colors.surface : theme.colors.text} />{' '}
                         {issuer.name}
                       </Text>
                     </TouchableOpacity>
@@ -146,6 +163,7 @@ const TrustChainSection: React.FC<TrustChainSectionProps> = ({
                   onChangeText={onChildDidChange}
                   placeholder="DID do emissor (ex: did:web:dept.ufsc.br)"
                   editable={!isChainLoading}
+                  accessibilityLabel="DID do emissor filho"
                 />
                 <TextInput
                   style={[styles.input, {marginTop: 8}]}
@@ -153,11 +171,14 @@ const TrustChainSection: React.FC<TrustChainSectionProps> = ({
                   onChangeText={onChildNameChange}
                   placeholder="Nome do emissor (ex: CAGR)"
                   editable={!isChainLoading}
+                  accessibilityLabel="Nome do emissor filho"
                 />
                 <TouchableOpacity
                   style={[styles.chainButton, {marginTop: 12}]}
                   onPress={onRegisterChild}
-                  disabled={isChainLoading || !childDid.trim() || !childName.trim()}>
+                  disabled={isChainLoading || !childDid.trim() || !childName.trim()}
+                  accessibilityLabel="Registrar emissor filho"
+                  accessibilityRole="button">
                   <Text style={styles.chainButtonText}>
                     {isChainLoading ? 'Registrando...' : 'Registrar Emissor'}
                   </Text>
@@ -171,18 +192,18 @@ const TrustChainSection: React.FC<TrustChainSectionProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   section: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.medium,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: scaleFontSize(18),
     fontWeight: 'bold',
-    color: '#003366',
-    marginBottom: 16,
+    color: theme.colors.primary,
+    marginBottom: theme.spacing.md,
   },
   chainHeader: {
     flexDirection: 'row',
@@ -190,75 +211,75 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   chainBadge: {
-    fontSize: 12,
-    color: '#666',
-    backgroundColor: '#e8f0fe',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    fontSize: scaleFontSize(12),
+    color: theme.colors.textSecondary,
+    backgroundColor: theme.colors.background,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.xs,
     borderRadius: 12,
   },
   chainEmptyState: {
     alignItems: 'center',
-    paddingVertical: 16,
+    paddingVertical: theme.spacing.md,
   },
   chainEmptyText: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: scaleFontSize(14),
+    color: theme.colors.textSecondary,
     textAlign: 'center',
-    marginBottom: 16,
+    marginBottom: theme.spacing.md,
   },
   chainButton: {
-    backgroundColor: '#1565C0',
+    backgroundColor: theme.colors.primaryLight,
     padding: 12,
     borderRadius: 6,
     alignItems: 'center',
   },
   chainButtonText: {
-    color: '#fff',
-    fontSize: 14,
+    color: theme.colors.surface,
+    fontSize: scaleFontSize(14),
     fontWeight: '600',
   },
   chainList: {
-    marginBottom: 16,
+    marginBottom: theme.spacing.md,
   },
   chainIssuerCard: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: theme.colors.background,
     borderRadius: 6,
     padding: 12,
-    marginBottom: 8,
+    marginBottom: theme.spacing.sm,
     borderLeftWidth: 3,
-    borderLeftColor: '#90CAF9',
+    borderLeftColor: theme.colors.secondary,
   },
   chainRootCard: {
-    borderLeftColor: '#1565C0',
-    backgroundColor: '#e8f0fe',
+    borderLeftColor: theme.colors.primaryLight,
+    backgroundColor: theme.colors.background,
   },
   chainIssuerHeader: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   chainIssuerIcon: {
-    fontSize: 20,
+    fontSize: scaleFontSize(20),
     marginRight: 10,
   },
   chainIssuerInfo: {
     flex: 1,
   },
   chainIssuerName: {
-    fontSize: 14,
+    fontSize: scaleFontSize(14),
     fontWeight: '600',
-    color: '#333',
+    color: theme.colors.text,
   },
   chainIssuerDid: {
-    fontSize: 11,
-    color: '#666',
+    fontSize: scaleFontSize(11),
+    color: theme.colors.textSecondary,
     fontFamily: 'monospace',
     marginTop: 2,
   },
   chainParentLabel: {
-    fontSize: 11,
-    color: '#888',
-    marginTop: 4,
+    fontSize: scaleFontSize(11),
+    color: theme.colors.textDisabled,
+    marginTop: theme.spacing.xs,
     marginLeft: 30,
   },
   chainConnector: {
@@ -266,64 +287,64 @@ const styles = StyleSheet.create({
     marginVertical: 2,
   },
   chainConnectorText: {
-    fontSize: 16,
-    color: '#90CAF9',
+    fontSize: scaleFontSize(16),
+    color: theme.colors.secondary,
   },
   chainRegisterSection: {
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
-    paddingTop: 16,
+    borderTopColor: theme.colors.divider,
+    paddingTop: theme.spacing.md,
   },
   chainRegisterTitle: {
-    fontSize: 14,
+    fontSize: scaleFontSize(14),
     fontWeight: '600',
-    color: '#333',
+    color: theme.colors.text,
     marginBottom: 12,
   },
   parentSelectorLabel: {
-    fontSize: 13,
-    color: '#555',
+    fontSize: scaleFontSize(13),
+    color: theme.colors.textSecondary,
     marginBottom: 6,
   },
   parentSelectorRow: {
     flexDirection: 'row',
-    marginBottom: 4,
+    marginBottom: theme.spacing.xs,
     maxHeight: 40,
   },
   parentChip: {
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: theme.colors.background,
     borderWidth: 1,
-    borderColor: '#ddd',
-    marginRight: 8,
+    borderColor: theme.colors.border,
+    marginRight: theme.spacing.sm,
   },
   parentChipSelected: {
-    backgroundColor: '#1565C0',
-    borderColor: '#1565C0',
+    backgroundColor: theme.colors.primaryLight,
+    borderColor: theme.colors.primaryLight,
   },
   parentChipText: {
-    fontSize: 12,
-    color: '#333',
+    fontSize: scaleFontSize(12),
+    color: theme.colors.text,
   },
   parentChipTextSelected: {
-    color: '#fff',
+    color: theme.colors.surface,
     fontWeight: '600',
   },
   parentSelectedHint: {
-    fontSize: 11,
-    color: '#888',
-    marginTop: 4,
+    fontSize: scaleFontSize(11),
+    color: theme.colors.textDisabled,
+    marginTop: theme.spacing.xs,
     fontStyle: 'italic',
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 4,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.small,
     padding: 12,
-    fontSize: 16,
-    backgroundColor: '#fff',
+    fontSize: scaleFontSize(16),
+    backgroundColor: theme.colors.surface,
   },
 });
 

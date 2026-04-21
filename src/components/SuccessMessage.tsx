@@ -1,5 +1,7 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
+import {getTheme, scaleFontSize, Theme} from '../utils/theme';
 
 interface SuccessMessageProps {
   message: string;
@@ -7,6 +9,9 @@ interface SuccessMessageProps {
 }
 
 const SuccessMessage: React.FC<SuccessMessageProps> = ({message, details}) => {
+  const theme = getTheme();
+  const styles = createStyles(theme);
+
   return (
     <View
       style={styles.container}
@@ -14,37 +19,37 @@ const SuccessMessage: React.FC<SuccessMessageProps> = ({message, details}) => {
       accessibilityLabel={`Sucesso: ${message}${details ? '. ' + details : ''}`}
       accessibilityRole="alert"
       accessibilityLiveRegion="polite">
-      <Text style={styles.icon} accessible={false}>✓</Text>
+      <MaterialCommunityIcons name="check-circle" size={24} color={theme.colors.success} style={styles.icon} />
       <Text style={styles.message}>{message}</Text>
       {details && <Text style={styles.details}>{details}</Text>}
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
-    backgroundColor: '#e8f5e9',
+    backgroundColor: theme.colors.successLight,
     borderLeftWidth: 4,
-    borderLeftColor: '#2e7d32',
-    padding: 16,
-    marginVertical: 8,
-    borderRadius: 4,
+    borderLeftColor: theme.colors.success,
+    padding: theme.spacing.md,
+    marginVertical: theme.spacing.sm,
+    borderRadius: theme.borderRadius.small,
   },
   icon: {
-    fontSize: 24,
-    marginBottom: 8,
-    color: '#2e7d32',
+    fontSize: scaleFontSize(24),
+    marginBottom: theme.spacing.sm,
+    color: theme.colors.success,
   },
   message: {
-    fontSize: 16,
+    fontSize: scaleFontSize(16),
     fontWeight: 'bold',
-    color: '#2e7d32',
-    marginBottom: 4,
+    color: theme.colors.success,
+    marginBottom: theme.spacing.xs,
   },
   details: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 4,
+    fontSize: scaleFontSize(14),
+    color: theme.colors.textSecondary,
+    marginTop: theme.spacing.xs,
   },
 });
 

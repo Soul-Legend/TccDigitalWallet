@@ -4,9 +4,13 @@ import {
   Text,
   StyleSheet,
   ScrollView,
+  FlatList,
   TextInput,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
 import {
   LoadingIndicator,
   ErrorMessage,
@@ -17,8 +21,13 @@ import {
 } from '../components';
 import QRCode from 'react-native-qrcode-svg';
 import {useHolderState} from './hooks/useHolderState';
+import {getTheme, scaleFontSize} from '../utils/theme';
+import type {Theme} from '../utils/theme';
 
 const HolderScreen: React.FC = () => {
+  const theme = getTheme();
+  const styles = createStyles(theme);
+
   const {
     credentialInput,
     setCredentialInput,
@@ -26,7 +35,6 @@ const HolderScreen: React.FC = () => {
     error,
     success,
     credentials,
-    currentIndex,
     isLoadingCredentials,
     requestInput,
     setRequestInput,
@@ -37,8 +45,6 @@ const HolderScreen: React.FC = () => {
     transportMode,
     presentationOutput,
     handleStoreCredential,
-    handlePrevious,
-    handleNext,
     handleDeleteCredential,
     handleProcessRequest,
     handleAttributeToggle,
@@ -49,7 +55,8 @@ const HolderScreen: React.FC = () => {
   } = useHolderState();
 
   return (
-    <ScrollView style={styles.container}>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{flex: 1}}>
+    <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
       <View style={styles.content}>
         <Text style={styles.title}>Módulo Titular</Text>
         <Text style={styles.subtitle}>
@@ -62,17 +69,19 @@ const HolderScreen: React.FC = () => {
           <TextInput
             style={styles.input}
             placeholder="Cole sua credencial aqui (SD-JWT ou AnonCreds)"
-            placeholderTextColor="#999"
+            placeholderTextColor={theme.colors.textDisabled}
             multiline
             numberOfLines={4}
             value={credentialInput}
             onChangeText={setCredentialInput}
             editable={!isLoading}
+            accessibilityLabel="Campo de entrada de credencial"
           />
           <TouchableOpacity
             style={[styles.button, isLoading && styles.buttonDisabled]}
             onPress={handleStoreCredential}
-            disabled={isLoading}>
+            disabled={isLoading}
+            accessibilityLabel={isLoading ? 'Processando credencial' : 'Armazenar credencial'}>
             <Text style={styles.buttonText}>
               {isLoading ? 'Processando...' : 'Armazenar Credencial'}
             </Text>
@@ -108,17 +117,19 @@ const HolderScreen: React.FC = () => {
               <TextInput
                 style={styles.input}
                 placeholder="Cole a requisição PEX aqui"
-                placeholderTextColor="#999"
+                placeholderTextColor={theme.colors.textDisabled}
                 multiline
                 numberOfLines={4}
                 value={requestInput}
                 onChangeText={setRequestInput}
                 editable={!isProcessingRequest}
+                accessibilityLabel="Campo de requisição PEX"
               />
               <TouchableOpacity
                 style={[styles.button, isProcessingRequest && styles.buttonDisabled]}
                 onPress={handleProcessRequest}
-                disabled={isProcessingRequest}>
+                disabled={isProcessingRequest}
+                accessibilityLabel={isProcessingRequest ? 'Processando requisição' : 'Processar requisição'}>
                 <Text style={styles.buttonText}>
                   {isProcessingRequest ? 'Processando...' : 'Processar Requisição'}
                 </Text>
@@ -134,8 +145,8 @@ const HolderScreen: React.FC = () => {
                     <QRCode
                       value={presentationOutput}
                       size={220}
-                      backgroundColor="#ffffff"
-                      color="#003366"
+                      backgroundColor={theme.colors.surface}
+                      color={theme.colors.primary}
                     />
                     <Text style={styles.qrHint}>
                       Escaneie com o módulo Verificador
@@ -144,8 +155,12 @@ const HolderScreen: React.FC = () => {
                 ) : null}
                 <TouchableOpacity
                   style={styles.copyOutputButton}
-                  onPress={handleCopyOutput}>
-                  <Text style={styles.copyOutputButtonText}>📋 Copiar Apresentação</Text>
+                  onPress={handleCopyOutput}
+                  accessibilityLabel="Copiar apresentação">
+                  <View style={{flexDirection: 'row', alignItems: 'center', gap: 4}}>
+                    <MaterialCommunityIcons name="clipboard-text" size={16} color={theme.colors.surface} />
+                    <Text style={styles.copyOutputButtonText}>Copiar Apresentação</Text>
+                  </View>
                 </TouchableOpacity>
               </View>
             )}
@@ -157,6 +172,7 @@ const HolderScreen: React.FC = () => {
           visible={showConsentModal}
           consentData={consentData}
           selectedAttributes={selectedAttributes}
+          isGenerating={isProcessingRequest}
           onAttributeToggle={handleAttributeToggle}
           onApprove={handleApproveConsent}
           onCancel={handleCancelConsent}
@@ -170,59 +186,35 @@ const HolderScreen: React.FC = () => {
             <View style={styles.navigationHeader}>
               <Text style={styles.sectionTitle}>Minhas Credenciais</Text>
               <Text style={styles.credentialCounter}>
-                {currentIndex + 1} de {credentials.length}
+                {credentials.length} credencial(is)
               </Text>
             </View>
 
-            {/* Credential Card */}
-            <CredentialCard credential={credentials[currentIndex]} />
-
-            {/* Navigation Controls */}
-            <View style={styles.navigationControls}>
-              <TouchableOpacity
-                style={[
-                  styles.navButton,
-                  currentIndex === 0 && styles.navButtonDisabled,
-                ]}
-                onPress={handlePrevious}
-                disabled={currentIndex === 0}>
-                <Text
-                  style={[
-                    styles.navButtonText,
-                    currentIndex === 0 && styles.navButtonTextDisabled,
-                  ]}>
-                  ← Anterior
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.deleteButton}
-                onPress={handleDeleteCredential}>
-                <Text style={styles.deleteButtonText}>🗑️ Excluir</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.navButton,
-                  currentIndex === credentials.length - 1 &&
-                    styles.navButtonDisabled,
-                ]}
-                onPress={handleNext}
-                disabled={currentIndex === credentials.length - 1}>
-                <Text
-                  style={[
-                    styles.navButtonText,
-                    currentIndex === credentials.length - 1 &&
-                      styles.navButtonTextDisabled,
-                  ]}>
-                  Próxima →
-                </Text>
-              </TouchableOpacity>
-            </View>
+            {/* Credential List */}
+            <FlatList
+              data={credentials}
+              keyExtractor={(_item, index) => `credential-${index}`}
+              scrollEnabled={false}
+              renderItem={({item, index}) => (
+                <View style={styles.credentialItemContainer}>
+                  <CredentialCard credential={item} />
+                  <TouchableOpacity
+                    style={styles.deleteButton}
+                    onPress={() => handleDeleteCredential(index)}
+                    accessibilityLabel={`Excluir credencial ${index + 1}`}>
+                    <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4}}>
+                      <MaterialCommunityIcons name="delete" size={16} color={theme.colors.surface} />
+                      <Text style={styles.deleteButtonText}>Excluir Credencial</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              )}
+              ItemSeparatorComponent={() => <View style={{height: theme.spacing.md}} />}
+            />
           </View>
         ) : (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyStateIcon}>📋</Text>
+            <MaterialCommunityIcons name="clipboard-text" size={64} color={theme.colors.textSecondary} style={{marginBottom: theme.spacing.md}} />
             <Text style={styles.emptyStateText}>
               Nenhuma credencial armazenada
             </Text>
@@ -233,198 +225,166 @@ const HolderScreen: React.FC = () => {
         )}
       </View>
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  content: {
-    padding: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#003366',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 24,
-  },
-  inputSection: {
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  requestSection: {
-    backgroundColor: '#fff8e1',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#ffd54f',
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#003366',
-    marginBottom: 12,
-  },
-  sectionSubtitle: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 12,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 14,
-    color: '#333',
-    backgroundColor: '#fafafa',
-    minHeight: 100,
-    textAlignVertical: 'top',
-    marginBottom: 12,
-  },
-  button: {
-    backgroundColor: '#003366',
-    borderRadius: 8,
-    padding: 16,
-    alignItems: 'center',
-  },
-  buttonDisabled: {
-    backgroundColor: '#999',
-  },
-  buttonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  credentialsSection: {
-    marginTop: 24,
-  },
-  navigationHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  credentialCounter: {
-    fontSize: 14,
-    color: '#666',
-    fontWeight: '500',
-  },
-  navigationControls: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 16,
-    gap: 12,
-  },
-  navButton: {
-    flex: 1,
-    backgroundColor: '#003366',
-    borderRadius: 8,
-    padding: 12,
-    alignItems: 'center',
-  },
-  navButtonDisabled: {
-    backgroundColor: '#e0e0e0',
-  },
-  navButtonText: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  navButtonTextDisabled: {
-    color: '#999',
-  },
-  deleteButton: {
-    backgroundColor: '#c62828',
-    borderRadius: 8,
-    padding: 12,
-    alignItems: 'center',
-    minWidth: 100,
-  },
-  deleteButtonText: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 40,
-    marginTop: 40,
-  },
-  emptyStateIcon: {
-    fontSize: 64,
-    marginBottom: 16,
-  },
-  emptyStateText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#666',
-    marginBottom: 8,
-  },
-  emptyStateSubtext: {
-    fontSize: 14,
-    color: '#999',
-    textAlign: 'center',
-  },
-  presentationOutputSection: {
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  qrContainer: {
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-  },
-  qrHint: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 12,
-    textAlign: 'center',
-  },
-  copyOutputButton: {
-    backgroundColor: '#1976d2',
-    borderRadius: 8,
-    padding: 12,
-    alignItems: 'center',
-  },
-  copyOutputButtonText: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    content: {
+      padding: theme.spacing.lg,
+    },
+    title: {
+      fontSize: scaleFontSize(theme.typography.fontSizeTitle + 4),
+      fontWeight: 'bold',
+      color: theme.colors.primary,
+      marginBottom: theme.spacing.sm,
+    },
+    subtitle: {
+      fontSize: scaleFontSize(theme.typography.fontSizeLarge),
+      color: theme.colors.textSecondary,
+      marginBottom: theme.spacing.lg,
+    },
+    inputSection: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borderRadius.medium,
+      padding: theme.spacing.md,
+      marginBottom: theme.spacing.md,
+      ...(theme.shadows.medium as any),
+    },
+    requestSection: {
+      backgroundColor: theme.colors.warningLight,
+      borderRadius: theme.borderRadius.medium,
+      padding: theme.spacing.md,
+      marginBottom: theme.spacing.md,
+      borderWidth: 1,
+      borderColor: theme.colors.warning,
+      ...(theme.shadows.medium as any),
+    },
+    sectionTitle: {
+      fontSize: scaleFontSize(18),
+      fontWeight: 'bold',
+      color: theme.colors.primary,
+      marginBottom: theme.spacing.sm + theme.spacing.xs,
+    },
+    sectionSubtitle: {
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      color: theme.colors.textSecondary,
+      marginBottom: theme.spacing.sm + theme.spacing.xs,
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: theme.borderRadius.medium,
+      padding: theme.spacing.sm + theme.spacing.xs,
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      color: theme.colors.text,
+      backgroundColor: theme.colors.background,
+      minHeight: 100,
+      textAlignVertical: 'top',
+      marginBottom: theme.spacing.sm + theme.spacing.xs,
+    },
+    button: {
+      backgroundColor: theme.colors.primary,
+      borderRadius: theme.borderRadius.medium,
+      padding: theme.spacing.md,
+      alignItems: 'center',
+    },
+    buttonDisabled: {
+      backgroundColor: theme.colors.textDisabled,
+    },
+    buttonText: {
+      color: theme.colors.surface,
+      fontSize: scaleFontSize(theme.typography.fontSizeLarge),
+      fontWeight: 'bold',
+    },
+    credentialsSection: {
+      marginTop: theme.spacing.lg,
+    },
+    navigationHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: theme.spacing.sm + theme.spacing.xs,
+    },
+    credentialCounter: {
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      color: theme.colors.textSecondary,
+      fontWeight: '500',
+    },
+    credentialItemContainer: {
+      marginBottom: theme.spacing.xs,
+    },
+    deleteButton: {
+      backgroundColor: theme.colors.error,
+      borderRadius: theme.borderRadius.medium,
+      padding: theme.spacing.sm + theme.spacing.xs,
+      alignItems: 'center',
+      marginTop: theme.spacing.sm,
+    },
+    deleteButtonText: {
+      color: theme.colors.surface,
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      fontWeight: '600',
+    },
+    emptyState: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: theme.spacing.xl + theme.spacing.sm,
+      marginTop: theme.spacing.xl + theme.spacing.sm,
+    },
+    emptyStateIcon: {
+      fontSize: scaleFontSize(64),
+      marginBottom: theme.spacing.md,
+    },
+    emptyStateText: {
+      fontSize: scaleFontSize(18),
+      fontWeight: '600',
+      color: theme.colors.textSecondary,
+      marginBottom: theme.spacing.sm,
+    },
+    emptyStateSubtext: {
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      color: theme.colors.textDisabled,
+      textAlign: 'center',
+    },
+    presentationOutputSection: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borderRadius.medium,
+      padding: theme.spacing.md,
+      marginBottom: theme.spacing.md,
+      ...(theme.shadows.medium as any),
+    },
+    qrContainer: {
+      alignItems: 'center',
+      padding: theme.spacing.lg,
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borderRadius.medium,
+      marginBottom: theme.spacing.sm + theme.spacing.xs,
+      borderWidth: 1,
+      borderColor: theme.colors.divider,
+    },
+    qrHint: {
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      color: theme.colors.textSecondary,
+      marginTop: theme.spacing.sm + theme.spacing.xs,
+      textAlign: 'center',
+    },
+    copyOutputButton: {
+      backgroundColor: theme.colors.secondary,
+      borderRadius: theme.borderRadius.medium,
+      padding: theme.spacing.sm + theme.spacing.xs,
+      alignItems: 'center',
+    },
+    copyOutputButtonText: {
+      color: theme.colors.surface,
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      fontWeight: '600',
+    },
+  });
 
 export default HolderScreen;

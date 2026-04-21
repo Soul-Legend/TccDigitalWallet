@@ -6,14 +6,18 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
 import {ConsentData, Predicate} from '../types';
 import {formatAttributeName} from '../utils/formatters';
+import {getTheme, scaleFontSize, Theme} from '../utils/theme';
 
 interface ConsentModalProps {
   visible: boolean;
   consentData: ConsentData | null;
   selectedAttributes: string[];
+  isGenerating?: boolean;
   onAttributeToggle: (attribute: string) => void;
   onApprove: () => void;
   onCancel: () => void;
@@ -32,10 +36,14 @@ const ConsentModal: React.FC<ConsentModalProps> = ({
   visible,
   consentData,
   selectedAttributes,
+  isGenerating = false,
   onAttributeToggle,
   onApprove,
   onCancel,
 }) => {
+  const theme = getTheme();
+  const styles = createStyles(theme);
+
   if (!consentData) {
     return null;
   }
@@ -83,7 +91,7 @@ const ConsentModal: React.FC<ConsentModalProps> = ({
             {consentData.required_attributes.length > 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>
-                  ✓ Atributos Obrigatórios
+                  <MaterialCommunityIcons name="check-circle" size={16} color={theme.colors.success} /> Atributos Obrigatórios
                 </Text>
                 <Text style={styles.sectionDescription}>
                   Estes atributos são necessários e serão compartilhados
@@ -118,7 +126,9 @@ const ConsentModal: React.FC<ConsentModalProps> = ({
                         styles.selectableAttribute,
                         isSelected && styles.selectedAttribute,
                       ]}
-                      onPress={() => onAttributeToggle(attr)}>
+                      onPress={() => onAttributeToggle(attr)}
+                      accessibilityLabel={`${formatAttributeName(attr)}${isSelected ? ', selecionado' : ', não selecionado'}`}
+                      accessibilityRole="checkbox">
                       <View style={styles.attributeIcon}>
                         <Text
                           style={[
@@ -150,7 +160,7 @@ const ConsentModal: React.FC<ConsentModalProps> = ({
                 </Text>
                 {consentData.predicates.map((predicate, index) => (
                   <View key={index} style={styles.predicateItem}>
-                    <Text style={styles.predicateIcon}>🔒</Text>
+                    <MaterialCommunityIcons name="lock" size={18} color={theme.colors.primary} style={styles.predicateIcon} />
                     <Text style={styles.predicateText}>
                       {formatPredicate(predicate)}
                     </Text>
@@ -177,13 +187,26 @@ const ConsentModal: React.FC<ConsentModalProps> = ({
           <View style={styles.actions}>
             <TouchableOpacity
               style={[styles.button, styles.cancelButton]}
-              onPress={onCancel}>
-              <Text style={styles.cancelButtonText}>Cancelar</Text>
+              onPress={onCancel}
+              disabled={isGenerating}
+              accessibilityLabel="Cancelar compartilhamento"
+              accessibilityRole="button">
+              <Text style={[styles.cancelButtonText, isGenerating && {opacity: 0.5}]}>Cancelar</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.button, styles.approveButton]}
-              onPress={onApprove}>
-              <Text style={styles.approveButtonText}>Aprovar</Text>
+              style={[styles.button, styles.approveButton, isGenerating && {opacity: 0.7}]}
+              onPress={onApprove}
+              disabled={isGenerating}
+              accessibilityLabel={isGenerating ? 'Gerando apresentação' : 'Aprovar compartilhamento de atributos'}
+              accessibilityRole="button">
+              {isGenerating ? (
+                <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
+                  <ActivityIndicator size="small" color={theme.colors.surface} />
+                  <Text style={styles.approveButtonText}>Gerando...</Text>
+                </View>
+              ) : (
+                <Text style={styles.approveButtonText}>Aprovar</Text>
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -192,54 +215,50 @@ const ConsentModal: React.FC<ConsentModalProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: theme.colors.overlay,
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContainer: {
-    backgroundColor: '#ffffff',
+    backgroundColor: theme.colors.surface,
     borderRadius: 16,
     width: '90%',
     maxHeight: '80%',
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    ...(theme.shadows.large as any),
   },
   header: {
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: theme.colors.divider,
   },
   title: {
-    fontSize: 22,
+    fontSize: scaleFontSize(22),
     fontWeight: 'bold',
-    color: '#003366',
-    marginBottom: 8,
+    color: theme.colors.primary,
+    marginBottom: theme.spacing.sm,
   },
   subtitle: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: scaleFontSize(14),
+    color: theme.colors.textSecondary,
   },
   content: {
     padding: 20,
   },
   section: {
-    marginBottom: 24,
+    marginBottom: theme.spacing.lg,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: scaleFontSize(16),
     fontWeight: 'bold',
-    color: '#003366',
-    marginBottom: 8,
+    color: theme.colors.primary,
+    marginBottom: theme.spacing.sm,
   },
   sectionDescription: {
-    fontSize: 13,
-    color: '#666',
+    fontSize: scaleFontSize(13),
+    color: theme.colors.textSecondary,
     marginBottom: 12,
     fontStyle: 'italic',
   },
@@ -248,18 +267,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
     paddingHorizontal: 12,
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
-    marginBottom: 8,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.borderRadius.medium,
+    marginBottom: theme.spacing.sm,
   },
   selectableAttribute: {
-    backgroundColor: '#ffffff',
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: theme.colors.border,
   },
   selectedAttribute: {
     backgroundColor: '#e3f2fd',
-    borderColor: '#2196f3',
+    borderColor: theme.colors.secondary,
   },
   attributeIcon: {
     marginRight: 12,
@@ -267,23 +286,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   requiredIcon: {
-    fontSize: 16,
-    color: '#c62828',
+    fontSize: scaleFontSize(16),
+    color: theme.colors.error,
   },
   optionalIcon: {
-    fontSize: 20,
-    color: '#666',
+    fontSize: scaleFontSize(20),
+    color: theme.colors.textSecondary,
   },
   selectedIcon: {
-    color: '#2196f3',
+    color: theme.colors.secondary,
   },
   attributeText: {
-    fontSize: 15,
-    color: '#333',
+    fontSize: scaleFontSize(15),
+    color: theme.colors.text,
     flex: 1,
   },
   selectedText: {
-    color: '#1976d2',
+    color: theme.colors.secondary,
     fontWeight: '500',
   },
   predicateItem: {
@@ -291,67 +310,67 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
     paddingHorizontal: 12,
-    backgroundColor: '#fff3e0',
-    borderRadius: 8,
-    marginBottom: 8,
+    backgroundColor: theme.colors.warningLight,
+    borderRadius: theme.borderRadius.medium,
+    marginBottom: theme.spacing.sm,
     borderWidth: 1,
-    borderColor: '#ffb74d',
+    borderColor: theme.colors.warning,
   },
   predicateIcon: {
-    fontSize: 16,
+    fontSize: scaleFontSize(16),
     marginRight: 12,
   },
   predicateText: {
-    fontSize: 14,
-    color: '#e65100',
+    fontSize: scaleFontSize(14),
+    color: theme.colors.warning,
     flex: 1,
   },
   summary: {
-    backgroundColor: '#e8f5e9',
-    borderRadius: 8,
-    padding: 16,
-    marginTop: 8,
+    backgroundColor: theme.colors.successLight,
+    borderRadius: theme.borderRadius.medium,
+    padding: theme.spacing.md,
+    marginTop: theme.spacing.sm,
   },
   summaryTitle: {
-    fontSize: 15,
+    fontSize: scaleFontSize(15),
     fontWeight: 'bold',
-    color: '#2e7d32',
-    marginBottom: 8,
+    color: theme.colors.success,
+    marginBottom: theme.spacing.sm,
   },
   summaryText: {
-    fontSize: 14,
-    color: '#388e3c',
-    marginBottom: 4,
+    fontSize: scaleFontSize(14),
+    color: theme.colors.success,
+    marginBottom: theme.spacing.xs,
   },
   actions: {
     flexDirection: 'row',
     padding: 20,
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: theme.colors.divider,
     gap: 12,
   },
   button: {
     flex: 1,
-    borderRadius: 8,
-    padding: 16,
+    borderRadius: theme.borderRadius.medium,
+    padding: theme.spacing.md,
     alignItems: 'center',
   },
   cancelButton: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: theme.colors.background,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: theme.colors.border,
   },
   cancelButtonText: {
-    color: '#666',
-    fontSize: 16,
+    color: theme.colors.textSecondary,
+    fontSize: scaleFontSize(16),
     fontWeight: '600',
   },
   approveButton: {
-    backgroundColor: '#003366',
+    backgroundColor: theme.colors.primary,
   },
   approveButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
+    color: theme.colors.surface,
+    fontSize: scaleFontSize(16),
     fontWeight: '600',
   },
 });

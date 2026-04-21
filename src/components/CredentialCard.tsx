@@ -1,12 +1,15 @@
 import React from 'react';
 import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import {VerifiableCredential} from '../types';
+import {getTheme, scaleFontSize, Theme} from '../utils/theme';
 
 interface CredentialCardProps {
   credential: VerifiableCredential;
 }
 
 const CredentialCard: React.FC<CredentialCardProps> = ({credential}) => {
+  const theme = getTheme();
+  const styles = createStyles(theme);
   const {credentialSubject} = credential;
 
   const formatDate = (dateString: string): string => {
@@ -172,39 +175,35 @@ const CredentialCard: React.FC<CredentialCardProps> = ({credential}) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.large,
     padding: 20,
     marginVertical: 12,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    ...(theme.shadows.large as any),
     maxHeight: 600,
   },
   header: {
     borderBottomWidth: 2,
-    borderBottomColor: '#003366',
+    borderBottomColor: theme.colors.primary,
     paddingBottom: 12,
-    marginBottom: 16,
+    marginBottom: theme.spacing.md,
   },
   title: {
-    fontSize: 20,
+    fontSize: scaleFontSize(20),
     fontWeight: 'bold',
-    color: '#003366',
-    marginBottom: 8,
+    color: theme.colors.primary,
+    marginBottom: theme.spacing.sm,
   },
   issuer: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 4,
+    fontSize: scaleFontSize(12),
+    color: theme.colors.textSecondary,
+    marginBottom: theme.spacing.xs,
   },
   date: {
-    fontSize: 12,
-    color: '#666',
+    fontSize: scaleFontSize(12),
+    color: theme.colors.textSecondary,
   },
   content: {
     flex: 1,
@@ -213,49 +212,49 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: scaleFontSize(16),
     fontWeight: 'bold',
-    color: '#003366',
+    color: theme.colors.primary,
     marginBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-    paddingBottom: 4,
+    borderBottomColor: theme.colors.divider,
+    paddingBottom: theme.spacing.xs,
   },
   field: {
-    marginBottom: 8,
+    marginBottom: theme.spacing.sm,
   },
   label: {
-    fontSize: 13,
-    color: '#666',
+    fontSize: scaleFontSize(13),
+    color: theme.colors.textSecondary,
     marginBottom: 2,
   },
   value: {
-    fontSize: 15,
-    color: '#333',
+    fontSize: scaleFontSize(15),
+    color: theme.colors.text,
     fontWeight: '500',
   },
   statusActive: {
-    color: '#2e7d32',
+    color: theme.colors.success,
     fontWeight: 'bold',
   },
   statusInactive: {
-    color: '#c62828',
+    color: theme.colors.error,
     fontWeight: 'bold',
   },
   footer: {
-    marginTop: 16,
-    paddingTop: 16,
+    marginTop: theme.spacing.md,
+    paddingTop: theme.spacing.md,
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: theme.colors.divider,
   },
   footerText: {
-    fontSize: 11,
-    color: '#999',
-    marginBottom: 4,
+    fontSize: scaleFontSize(11),
+    color: theme.colors.textDisabled,
+    marginBottom: theme.spacing.xs,
   },
   footerValue: {
-    fontSize: 10,
-    color: '#666',
+    fontSize: scaleFontSize(10),
+    color: theme.colors.textSecondary,
     fontFamily: 'monospace',
   },
 });

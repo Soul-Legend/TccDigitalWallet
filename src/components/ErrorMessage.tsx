@@ -1,5 +1,7 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
+import {getTheme, scaleFontSize, Theme} from '../utils/theme';
 
 interface ErrorMessageProps {
   message: string;
@@ -7,6 +9,9 @@ interface ErrorMessageProps {
 }
 
 const ErrorMessage: React.FC<ErrorMessageProps> = ({message, details}) => {
+  const theme = getTheme();
+  const styles = createStyles(theme);
+
   return (
     <View
       style={styles.container}
@@ -14,36 +19,36 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({message, details}) => {
       accessibilityLabel={`Erro: ${message}${details ? '. ' + details : ''}`}
       accessibilityRole="alert"
       accessibilityLiveRegion="assertive">
-      <Text style={styles.icon} accessible={false}>⚠️</Text>
+      <MaterialCommunityIcons name="alert" size={24} color={theme.colors.error} style={styles.icon} />
       <Text style={styles.message}>{message}</Text>
       {details && <Text style={styles.details}>{details}</Text>}
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
-    backgroundColor: '#ffebee',
+    backgroundColor: theme.colors.errorLight,
     borderLeftWidth: 4,
-    borderLeftColor: '#c62828',
-    padding: 16,
-    marginVertical: 8,
-    borderRadius: 4,
+    borderLeftColor: theme.colors.error,
+    padding: theme.spacing.md,
+    marginVertical: theme.spacing.sm,
+    borderRadius: theme.borderRadius.small,
   },
   icon: {
-    fontSize: 24,
-    marginBottom: 8,
+    fontSize: scaleFontSize(24),
+    marginBottom: theme.spacing.sm,
   },
   message: {
-    fontSize: 16,
+    fontSize: scaleFontSize(16),
     fontWeight: 'bold',
-    color: '#c62828',
-    marginBottom: 4,
+    color: theme.colors.error,
+    marginBottom: theme.spacing.xs,
   },
   details: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 4,
+    fontSize: scaleFontSize(14),
+    color: theme.colors.textSecondary,
+    marginTop: theme.spacing.xs,
   },
 });
 

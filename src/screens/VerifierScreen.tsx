@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -6,251 +6,44 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
-import * as Clipboard from 'expo-clipboard';
-import {useAppStore} from '../stores/useAppStore';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
 import {LoadingIndicator, ErrorMessage, SuccessMessage, TransportModeSelector} from '../components';
-import {Scenario, PresentationExchangeRequest, ValidationResult} from '../types';
-import {TransportMode} from '../services/TransportService';
-import CryptoService from '../services/CryptoService';
 import QRCode from 'react-native-qrcode-svg';
-
-// Hoisted: scenarios are immutable presets. The election_id for the
-// `elections` scenario is generated freshly when the user selects it (see
-// `handleSelectScenario`) so it doesn't get frozen at module load.
-//
-// IDs are aligned with `src/services/verification/ScenarioCatalog.ts` so the
-// UI catalogue and the back-end pipeline share a single naming scheme. The
-// human-readable Portuguese labels live here because they are display-only
-// concerns (the catalogue would otherwise need an i18n field).
-const SCENARIOS: readonly Scenario[] = [
-  {
-    id: 'ru',
-    name: 'Restaurante Universitário',
-    description: 'Validar vínculo e isenção tarifária com divulgação seletiva (SD-JWT)',
-    type: 'selective_disclosure',
-    requested_attributes: ['status_matricula', 'isencao_ru'],
-  },
-  {
-    id: 'elections',
-    name: 'Eleições',
-    description: 'Validar elegibilidade com prevenção de voto duplicado (ZKP + Nullifier)',
-    type: 'zkp_eligibility',
-    requested_attributes: ['status_matricula'],
-  },
-  {
-    id: 'lab_access',
-    name: 'Laboratórios',
-    description: 'Validar permissões de acesso físico específicas',
-    type: 'access_control',
-    requested_attributes: ['acesso_laboratorios', 'acesso_predios'],
-  },
-  {
-    id: 'age_verification',
-    name: 'Maioridade',
-    description: 'Validar maioridade civil sem revelar data de nascimento (Range Proof)',
-    type: 'range_proof',
-    predicates: [
-      {attribute: 'data_nascimento', p_type: '>=', value: 18},
-    ],
-  },
-];
+import {getTheme, scaleFontSize} from '../utils/theme';
+import type {Theme} from '../utils/theme';
+import {useVerifierState} from './hooks/useVerifierState';
 
 const VerifierScreen: React.FC = () => {
-  const setCurrentModule = useAppStore(state => state.setCurrentModule);
+  const theme = getTheme();
+  const styles = createStyles(theme);
 
-  const [selectedScenario, setSelectedScenario] = useState<Scenario | null>(null);
-  const [generatedRequest, setGeneratedRequest] = useState<string | null>(null);
-  const [presentationInput, setPresentationInput] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isValidating, setIsValidating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
-  const [labInput, setLabInput] = useState('');
-  const [transportMode, setTransportMode] = useState<TransportMode>('clipboard');
-
-  useEffect(() => {
-    setCurrentModule('verificador');
-  }, [setCurrentModule]);
-
-  // Pre-configured scenarios are hoisted to module scope (see SCENARIOS).
-  const scenarios = SCENARIOS;
-
-  /**
-   * Handles scenario selection and generates PEX request
-   */
-  const handleSelectScenario = async (scenario: Scenario) => {
-    // Inject a fresh election_id for the elections scenario so each PEX
-    // request gets a unique nullifier scope.
-    const liveScenario: Scenario =
-      scenario.id === 'elections'
-        ? {
-            ...scenario,
-            challenge_data: {election_id: `eleicao_${Date.now()}`},
-          }
-        : scenario;
-    setSelectedScenario(liveScenario);
-    setGeneratedRequest(null);
-    setValidationResult(null);
-    setPresentationInput('');
-    setError(null);
-    setSuccess(null);
-    setIsGenerating(true);
-
-    try {
-      // Generate PEX request based on scenario
-      const request = generatePEXRequest(liveScenario);
-      const requestJson = JSON.stringify(request, null, 2);
-      setGeneratedRequest(requestJson);
-      setSuccess('Requisição gerada com sucesso!');
-      setTimeout(() => setSuccess(null), 3000);
-    } catch (err: any) {
-      setError(err.message || 'Erro ao gerar requisição');
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  /**
-   * Generates a PEX request for the selected scenario
-   */
-  const generatePEXRequest = (scenario: Scenario): PresentationExchangeRequest => {
-    // SECURITY: PEX challenges must be unpredictable to prevent replay
-    // attacks. Use the CSPRNG-backed CryptoService.generateNonce() instead
-    // of Math.random (P0 C1 hardening, enforced by ESLint).
-    const challenge = `challenge_${Date.now()}_${CryptoService.generateNonce().slice(0, 16)}`;
-
-    const baseRequest: PresentationExchangeRequest = {
-      type: 'PresentationExchange',
-      version: '1.0.0',
-      challenge,
-      presentation_definition: {
-        id: `pd_${scenario.id}_${Date.now()}`,
-        input_descriptors: [
-          {
-            id: `input_${scenario.id}`,
-            name: scenario.name,
-            purpose: scenario.description,
-            constraints: {
-              fields: (scenario.requested_attributes || []).map(attr => ({
-                path: [`$.credentialSubject.${attr}`],
-                predicate: 'required' as const,
-              })),
-              limit_disclosure: 'required',
-            },
-          },
-        ],
-      },
-    };
-
-    // Add scenario-specific data
-    if (scenario.id === 'elections' && scenario.challenge_data?.election_id) {
-      baseRequest.election_id = scenario.challenge_data.election_id;
-    }
-
-    if (scenario.id === 'lab_access' && labInput.trim()) {
-      baseRequest.resource_id = labInput.trim();
-    }
-
-    if (scenario.predicates) {
-      baseRequest.predicates = scenario.predicates.map(p => ({
-        attribute: p.attribute,
-        p_type: p.p_type,
-        value: p.value,
-      }));
-    }
-
-    return baseRequest;
-  };
-
-  /**
-   * Copies the generated request to clipboard
-   */
-  const handleCopyRequest = () => {
-    if (generatedRequest) {
-      Clipboard.setStringAsync(generatedRequest);
-      setSuccess('Requisição copiada para área de transferência!');
-      setTimeout(() => setSuccess(null), 3000);
-    }
-  };
-
-  /**
-   * Validates the pasted presentation
-   */
-  const handleValidatePresentation = async () => {
-    if (!presentationInput.trim()) {
-      setError('Por favor, cole uma apresentação válida');
-      return;
-    }
-
-    if (!selectedScenario) {
-      setError('Selecione um cenário primeiro');
-      return;
-    }
-
-    if (!generatedRequest) {
-      setError('Gere uma requisição primeiro');
-      return;
-    }
-
-    setIsValidating(true);
-    setError(null);
-    setSuccess(null);
-    setValidationResult(null);
-
-    try {
-      // Parse the presentation to validate JSON format
-      const presentation = JSON.parse(presentationInput.trim());
-
-      // Parse the generated request
-      const pexRequest = JSON.parse(generatedRequest);
-
-      // Import VerificationService dynamically
-      const VerificationService = (await import('../services/VerificationService')).default;
-
-      // Validate the presentation
-      const result = await VerificationService.validatePresentation(
-        presentation,
-        pexRequest,
-      );
-
-      setValidationResult(result);
-
-      if (result.valid) {
-        setSuccess('Apresentação validada com sucesso!');
-      } else {
-        setError(
-          result.errors?.join(', ') || 'Apresentação inválida',
-        );
-      }
-
-      setTimeout(() => {
-        setSuccess(null);
-        setError(null);
-      }, 5000);
-    } catch (err: any) {
-      setError(err.message || 'Erro ao validar apresentação. Verifique o formato.');
-    } finally {
-      setIsValidating(false);
-    }
-  };
-
-  /**
-   * Resets the verifier state
-   */
-  const handleReset = () => {
-    setSelectedScenario(null);
-    setGeneratedRequest(null);
-    setPresentationInput('');
-    setValidationResult(null);
-    setError(null);
-    setSuccess(null);
-    setLabInput('');
-  };
+  const {
+    scenarios,
+    selectedScenario,
+    generatedRequest,
+    presentationInput,
+    setPresentationInput,
+    isGenerating,
+    isValidating,
+    error,
+    success,
+    validationResult,
+    labInput,
+    setLabInput,
+    transportMode,
+    handleSelectScenario,
+    handleCopyRequest,
+    handleValidatePresentation,
+    handleReset,
+    handleTransportModeChange,
+  } = useVerifierState();
 
   return (
-    <ScrollView style={styles.container}>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{flex: 1}}>
+    <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
       <View style={styles.content}>
         <Text style={styles.title}>Módulo Verificador</Text>
         <Text style={styles.subtitle}>
@@ -260,7 +53,7 @@ const VerifierScreen: React.FC = () => {
         {/* Transport Mode Selector */}
         <TransportModeSelector
           selectedMode={transportMode}
-          onSelectMode={setTransportMode}
+          onSelectMode={handleTransportModeChange}
           disabled={isGenerating || isValidating}
         />
 
@@ -272,17 +65,18 @@ const VerifierScreen: React.FC = () => {
               <TouchableOpacity
                 key={scenario.id}
                 style={styles.scenarioCard}
-                onPress={() => handleSelectScenario(scenario)}>
+                onPress={() => handleSelectScenario(scenario)}
+                accessibilityLabel={`Selecionar cenário ${scenario.name}`}>
                 <Text style={styles.scenarioName}>{scenario.name}</Text>
                 <Text style={styles.scenarioDescription}>
                   {scenario.description}
                 </Text>
                 <View style={styles.scenarioTypeBadge}>
                   <Text style={styles.scenarioTypeText}>
-                    {scenario.type === 'selective_disclosure' && '🔒 SD-JWT'}
-                    {scenario.type === 'zkp_eligibility' && '🔐 ZKP'}
-                    {scenario.type === 'range_proof' && '📊 Range Proof'}
-                    {scenario.type === 'access_control' && '🚪 Controle de Acesso'}
+                    {scenario.type === 'selective_disclosure' && <><MaterialCommunityIcons name="lock" size={14} color={theme.colors.secondary} /> SD-JWT</>}
+                    {scenario.type === 'zkp_eligibility' && <><MaterialCommunityIcons name="shield-lock" size={14} color={theme.colors.secondary} /> ZKP</>}
+                    {scenario.type === 'range_proof' && <><MaterialCommunityIcons name="chart-bar" size={14} color={theme.colors.secondary} /> Range Proof</>}
+                    {scenario.type === 'access_control' && <><MaterialCommunityIcons name="door" size={14} color={theme.colors.secondary} /> Controle de Acesso</>}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -305,8 +99,9 @@ const VerifierScreen: React.FC = () => {
               </View>
               <TouchableOpacity
                 style={styles.resetButton}
-                onPress={handleReset}>
-                <Text style={styles.resetButtonText}>← Voltar</Text>
+                onPress={handleReset}
+                accessibilityLabel="Voltar para seleção de cenários">
+                <Text style={styles.resetButtonText}><MaterialCommunityIcons name="chevron-left" size={16} color={theme.colors.success} /> Voltar</Text>
               </TouchableOpacity>
             </View>
 
@@ -319,20 +114,16 @@ const VerifierScreen: React.FC = () => {
                 <TextInput
                   style={styles.input}
                   placeholder="Ex: Lab 101, Prédio A"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={theme.colors.textDisabled}
                   value={labInput}
                   onChangeText={setLabInput}
+                  accessibilityLabel="Especifique o laboratório ou prédio"
                 />
                 <TouchableOpacity
                   style={[styles.button, !labInput.trim() && styles.buttonDisabled]}
-                  onPress={() => {
-                    if (!labInput.trim()) {
-                      setError('Por favor, especifique o laboratório ou prédio');
-                      return;
-                    }
-                    handleSelectScenario(selectedScenario);
-                  }}
-                  disabled={!labInput.trim()}>
+                  onPress={() => handleSelectScenario(selectedScenario)}
+                  disabled={!labInput.trim()}
+                  accessibilityLabel="Gerar requisição de verificação">
                   <Text style={styles.buttonText}>Gerar Requisição</Text>
                 </TouchableOpacity>
               </View>
@@ -354,8 +145,8 @@ const VerifierScreen: React.FC = () => {
                     <QRCode
                       value={generatedRequest}
                       size={220}
-                      backgroundColor="#ffffff"
-                      color="#003366"
+                      backgroundColor={theme.colors.surface}
+                      color={theme.colors.primary}
                     />
                     <Text style={styles.qrHint}>
                       Escaneie com o módulo Titular
@@ -377,10 +168,12 @@ const VerifierScreen: React.FC = () => {
                 {transportMode === 'clipboard' && (
                   <TouchableOpacity
                     style={styles.copyButton}
-                    onPress={handleCopyRequest}>
-                    <Text style={styles.copyButtonText}>
-                      📋 Copiar para Área de Transferência
-                    </Text>
+                    onPress={handleCopyRequest}
+                    accessibilityLabel="Copiar requisição para área de transferência">
+                    <View style={{flexDirection: 'row', alignItems: 'center', gap: 4}}>
+                      <MaterialCommunityIcons name="clipboard-text" size={16} color={theme.colors.surface} />
+                      <Text style={styles.copyButtonText}>Copiar para Área de Transferência</Text>
+                    </View>
                   </TouchableOpacity>
                 )}
               </View>
@@ -396,17 +189,19 @@ const VerifierScreen: React.FC = () => {
                 <TextInput
                   style={styles.input}
                   placeholder="Cole a apresentação aqui"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={theme.colors.textDisabled}
                   multiline
                   numberOfLines={6}
                   value={presentationInput}
                   onChangeText={setPresentationInput}
                   editable={!isValidating}
+                  accessibilityLabel="Cole a apresentação aqui"
                 />
                 <TouchableOpacity
                   style={[styles.button, isValidating && styles.buttonDisabled]}
                   onPress={handleValidatePresentation}
-                  disabled={isValidating}>
+                  disabled={isValidating}
+                  accessibilityLabel="Validar apresentação">
                   <Text style={styles.buttonText}>
                     {isValidating ? 'Validando...' : 'Validar Apresentação'}
                   </Text>
@@ -428,9 +223,12 @@ const VerifierScreen: React.FC = () => {
                     ? styles.validationSuccess
                     : styles.validationFailure,
                 ]}>
-                <Text style={styles.validationIcon}>
-                  {validationResult.valid ? '✅' : '❌'}
-                </Text>
+                <MaterialCommunityIcons
+                  name={validationResult.valid ? 'check-circle' : 'close-circle'}
+                  size={48}
+                  color={validationResult.valid ? theme.colors.success : theme.colors.error}
+                  style={styles.validationIcon}
+                />
                 <Text style={styles.validationTitle}>
                   {validationResult.valid
                     ? 'Apresentação Válida'
@@ -440,9 +238,12 @@ const VerifierScreen: React.FC = () => {
                 {/* Trust Chain Status */}
                 {validationResult.trust_chain_valid !== undefined && (
                   <View style={styles.trustChainStatus}>
-                    <Text style={styles.trustChainIcon}>
-                      {validationResult.trust_chain_valid ? '🔗' : '⛓️‍💥'}
-                    </Text>
+                    <MaterialCommunityIcons
+                      name={validationResult.trust_chain_valid ? 'link-variant' : 'link-variant-off'}
+                      size={20}
+                      color={validationResult.trust_chain_valid ? theme.colors.success : theme.colors.error}
+                      style={styles.trustChainIcon}
+                    />
                     <Text
                       style={[
                         styles.trustChainText,
@@ -478,82 +279,79 @@ const VerifierScreen: React.FC = () => {
         {success && <SuccessMessage message={success} />}
       </View>
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: theme.colors.background,
   },
   content: {
-    padding: 20,
+    padding: theme.spacing.md + theme.spacing.xs,
   },
   title: {
-    fontSize: 28,
+    fontSize: scaleFontSize(28),
     fontWeight: 'bold',
-    color: '#003366',
-    marginBottom: 8,
+    color: theme.colors.primary,
+    marginBottom: theme.spacing.sm,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 24,
+    fontSize: scaleFontSize(theme.typography.fontSizeLarge),
+    color: theme.colors.textSecondary,
+    marginBottom: theme.spacing.lg,
   },
   scenarioSection: {
-    marginBottom: 16,
+    marginBottom: theme.spacing.md,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: scaleFontSize(18),
     fontWeight: 'bold',
-    color: '#003366',
-    marginBottom: 12,
+    color: theme.colors.primary,
+    marginBottom: theme.spacing.sm + theme.spacing.xs,
   },
   sectionSubtitle: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 12,
+    fontSize: scaleFontSize(theme.typography.fontSizeBase),
+    color: theme.colors.textSecondary,
+    marginBottom: theme.spacing.sm + theme.spacing.xs,
   },
   scenarioCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.medium,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.sm + theme.spacing.xs,
+    ...(theme.shadows.medium as object),
   },
   scenarioName: {
-    fontSize: 18,
+    fontSize: scaleFontSize(18),
     fontWeight: 'bold',
-    color: '#003366',
-    marginBottom: 8,
+    color: theme.colors.primary,
+    marginBottom: theme.spacing.sm,
   },
   scenarioDescription: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 12,
-    lineHeight: 20,
+    fontSize: scaleFontSize(theme.typography.fontSizeBase),
+    color: theme.colors.textSecondary,
+    marginBottom: theme.spacing.sm + theme.spacing.xs,
+    lineHeight: theme.typography.lineHeightBase,
   },
   scenarioTypeBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#e3f2fd',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.borderRadius.large,
+    paddingHorizontal: theme.spacing.sm + theme.spacing.xs,
+    paddingVertical: theme.spacing.xs,
   },
   scenarioTypeText: {
-    fontSize: 12,
-    color: '#1976d2',
+    fontSize: scaleFontSize(theme.typography.fontSizeSmall),
+    color: theme.colors.secondary,
     fontWeight: '600',
   },
   selectedScenarioHeader: {
-    backgroundColor: '#e8f5e9',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
+    backgroundColor: theme.colors.successLight,
+    borderRadius: theme.borderRadius.medium,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -562,179 +360,175 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   selectedScenarioName: {
-    fontSize: 20,
+    fontSize: scaleFontSize(theme.typography.fontSizeXLarge),
     fontWeight: 'bold',
-    color: '#2e7d32',
-    marginBottom: 4,
+    color: theme.colors.success,
+    marginBottom: theme.spacing.xs,
   },
   selectedScenarioDescription: {
-    fontSize: 14,
-    color: '#558b2f',
+    fontSize: scaleFontSize(theme.typography.fontSizeBase),
+    color: theme.colors.success,
   },
   resetButton: {
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.medium,
+    paddingHorizontal: theme.spacing.sm + theme.spacing.xs,
+    paddingVertical: theme.spacing.sm,
     borderWidth: 1,
-    borderColor: '#2e7d32',
+    borderColor: theme.colors.success,
   },
   resetButtonText: {
-    color: '#2e7d32',
-    fontSize: 14,
+    color: theme.colors.success,
+    fontSize: scaleFontSize(theme.typography.fontSizeBase),
     fontWeight: '600',
   },
   labInputSection: {
-    backgroundColor: '#fff3e0',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
+    backgroundColor: theme.colors.warningLight,
+    borderRadius: theme.borderRadius.medium,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
     borderWidth: 1,
-    borderColor: '#ffb74d',
+    borderColor: theme.colors.warning,
   },
   challengeSection: {
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.medium,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
+    ...(theme.shadows.medium as object),
   },
   challengeDisplay: {
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.borderRadius.medium,
+    padding: theme.spacing.sm + theme.spacing.xs,
+    marginBottom: theme.spacing.sm + theme.spacing.xs,
     maxHeight: 200,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: theme.colors.border,
   },
   challengeScroll: {
     maxHeight: 180,
   },
   challengeText: {
-    fontSize: 12,
+    fontSize: scaleFontSize(theme.typography.fontSizeSmall),
     fontFamily: 'monospace',
-    color: '#333',
+    color: theme.colors.text,
   },
   copyButton: {
-    backgroundColor: '#1976d2',
-    borderRadius: 8,
-    padding: 12,
+    backgroundColor: theme.colors.secondary,
+    borderRadius: theme.borderRadius.medium,
+    padding: theme.spacing.sm + theme.spacing.xs,
     alignItems: 'center',
   },
   copyButtonText: {
-    color: '#ffffff',
-    fontSize: 14,
+    color: theme.colors.surface,
+    fontSize: scaleFontSize(theme.typography.fontSizeBase),
     fontWeight: '600',
   },
   presentationSection: {
-    backgroundColor: '#e1f5fe',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.borderRadius.medium,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
     borderWidth: 1,
-    borderColor: '#4fc3f7',
+    borderColor: theme.colors.secondary,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 14,
-    color: '#333',
-    backgroundColor: '#ffffff',
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.medium,
+    padding: theme.spacing.sm + theme.spacing.xs,
+    fontSize: scaleFontSize(theme.typography.fontSizeBase),
+    color: theme.colors.text,
+    backgroundColor: theme.colors.surface,
     minHeight: 100,
     textAlignVertical: 'top',
-    marginBottom: 12,
+    marginBottom: theme.spacing.sm + theme.spacing.xs,
   },
   button: {
-    backgroundColor: '#003366',
-    borderRadius: 8,
-    padding: 16,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.borderRadius.medium,
+    padding: theme.spacing.md,
     alignItems: 'center',
   },
   buttonDisabled: {
-    backgroundColor: '#999',
+    backgroundColor: theme.colors.textDisabled,
   },
   buttonText: {
-    color: '#ffffff',
-    fontSize: 16,
+    color: theme.colors.surface,
+    fontSize: scaleFontSize(theme.typography.fontSizeLarge),
     fontWeight: 'bold',
   },
   validationResult: {
-    borderRadius: 8,
-    padding: 20,
-    marginTop: 16,
+    borderRadius: theme.borderRadius.medium,
+    padding: theme.spacing.md + theme.spacing.xs,
+    marginTop: theme.spacing.md,
     alignItems: 'center',
   },
   validationSuccess: {
-    backgroundColor: '#e8f5e9',
+    backgroundColor: theme.colors.successLight,
     borderWidth: 2,
-    borderColor: '#4caf50',
+    borderColor: theme.colors.success,
   },
   validationFailure: {
-    backgroundColor: '#ffebee',
+    backgroundColor: theme.colors.errorLight,
     borderWidth: 2,
-    borderColor: '#f44336',
+    borderColor: theme.colors.error,
   },
   validationIcon: {
-    fontSize: 48,
-    marginBottom: 12,
+    fontSize: scaleFontSize(48),
+    marginBottom: theme.spacing.sm + theme.spacing.xs,
   },
   validationTitle: {
-    fontSize: 20,
+    fontSize: scaleFontSize(theme.typography.fontSizeXLarge),
     fontWeight: 'bold',
-    color: '#003366',
-    marginBottom: 8,
+    color: theme.colors.primary,
+    marginBottom: theme.spacing.sm,
   },
   validationErrors: {
-    marginTop: 12,
+    marginTop: theme.spacing.sm + theme.spacing.xs,
     alignSelf: 'stretch',
   },
   validationErrorText: {
-    fontSize: 14,
-    color: '#c62828',
-    marginBottom: 4,
+    fontSize: scaleFontSize(theme.typography.fontSizeBase),
+    color: theme.colors.error,
+    marginBottom: theme.spacing.xs,
   },
   trustChainStatus: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 8,
-    paddingTop: 8,
+    marginTop: theme.spacing.sm,
+    paddingTop: theme.spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(0,0,0,0.1)',
+    borderTopColor: theme.colors.divider,
   },
   trustChainIcon: {
-    fontSize: 16,
-    marginRight: 8,
+    fontSize: scaleFontSize(theme.typography.fontSizeLarge),
+    marginRight: theme.spacing.sm,
   },
   trustChainText: {
-    fontSize: 14,
+    fontSize: scaleFontSize(theme.typography.fontSizeBase),
     fontWeight: '600',
   },
   trustChainValid: {
-    color: '#2e7d32',
+    color: theme.colors.success,
   },
   trustChainInvalid: {
-    color: '#c62828',
+    color: theme.colors.error,
   },
   qrContainer: {
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    marginBottom: 12,
+    padding: theme.spacing.md + theme.spacing.xs,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.medium,
+    marginBottom: theme.spacing.sm + theme.spacing.xs,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: theme.colors.divider,
   },
   qrHint: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 12,
+    fontSize: scaleFontSize(theme.typography.fontSizeBase),
+    color: theme.colors.textSecondary,
+    marginTop: theme.spacing.sm + theme.spacing.xs,
     textAlign: 'center',
   },
 });

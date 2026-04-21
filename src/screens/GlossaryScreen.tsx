@@ -15,6 +15,7 @@ import {
 } from '../utils/glossary';
 import {MIN_TOUCH_TARGET_SIZE} from '../utils/accessibility';
 import {getTheme, scaleFontSize} from '../utils/theme';
+import type {Theme} from '../utils/theme';
 
 // Hoisted out of the component body — these never change between renders.
 const CATEGORIES = [
@@ -32,10 +33,142 @@ const CATEGORY_COLORS: Record<string, string> = {
   protocol: '#ff9800',
 };
 
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    header: {
+      backgroundColor: theme.colors.primary,
+      padding: theme.spacing.lg,
+      paddingTop: theme.spacing.lg,
+    },
+    title: {
+      fontSize: scaleFontSize(theme.typography.fontSizeTitle),
+      fontWeight: 'bold',
+      color: theme.colors.surface,
+      marginBottom: theme.spacing.xs,
+    },
+    subtitle: {
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      color: theme.colors.primaryLight,
+    },
+    searchContainer: {
+      padding: theme.spacing.md,
+      backgroundColor: theme.colors.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.divider,
+    },
+    searchInput: {
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: theme.borderRadius.medium,
+      padding: theme.spacing.md,
+      fontSize: scaleFontSize(theme.typography.fontSizeLarge),
+      backgroundColor: theme.colors.background,
+      minHeight: MIN_TOUCH_TARGET_SIZE,
+    },
+    categoryScroll: {
+      backgroundColor: theme.colors.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.divider,
+    },
+    categoryContainer: {
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.md,
+      gap: theme.spacing.sm,
+    },
+    categoryButton: {
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.sm,
+      borderRadius: 20,
+      backgroundColor: theme.colors.background,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      minHeight: MIN_TOUCH_TARGET_SIZE,
+      justifyContent: 'center',
+    },
+    categoryButtonActive: {
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
+    },
+    categoryButtonText: {
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      color: theme.colors.textSecondary,
+      fontWeight: '500',
+    },
+    categoryButtonTextActive: {
+      color: theme.colors.surface,
+      fontWeight: 'bold',
+    },
+    termsList: {
+      flex: 1,
+      padding: theme.spacing.md,
+    },
+    termCard: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borderRadius.medium,
+      padding: theme.spacing.md,
+      marginBottom: theme.spacing.md,
+      ...(theme.shadows.medium as any),
+    },
+    termHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      marginBottom: theme.spacing.sm,
+    },
+    termTitle: {
+      fontSize: scaleFontSize(theme.typography.fontSizeLarge),
+      fontWeight: 'bold',
+      color: theme.colors.primary,
+      flex: 1,
+      marginRight: theme.spacing.sm,
+    },
+    categoryBadge: {
+      paddingHorizontal: theme.spacing.sm,
+      paddingVertical: theme.spacing.xs,
+      borderRadius: theme.borderRadius.large,
+    },
+    categoryBadgeText: {
+      fontSize: scaleFontSize(theme.typography.fontSizeSmall - 1),
+      color: theme.colors.surface,
+      fontWeight: '600',
+    },
+    termDefinition: {
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      color: theme.colors.text,
+      lineHeight: scaleFontSize(theme.typography.lineHeightBase),
+    },
+    emptyState: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: theme.spacing.xl,
+      marginTop: theme.spacing.xl,
+    },
+    emptyStateIcon: {
+      fontSize: 64,
+      marginBottom: theme.spacing.md,
+    },
+    emptyStateText: {
+      fontSize: scaleFontSize(theme.typography.fontSizeLarge + 2),
+      fontWeight: '600',
+      color: theme.colors.textSecondary,
+      marginBottom: theme.spacing.sm,
+    },
+    emptyStateSubtext: {
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      color: theme.colors.textDisabled,
+      textAlign: 'center',
+    },
+  });
+
 const GlossaryScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const theme = getTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const categories = CATEGORIES;
 
@@ -160,139 +293,5 @@ const GlossaryScreen: React.FC = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    backgroundColor: '#003366',
-    padding: 20,
-    paddingTop: 24,
-  },
-  title: {
-    fontSize: scaleFontSize(24),
-    fontWeight: 'bold',
-    color: '#ffffff',
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: scaleFontSize(14),
-    color: '#b3d9ff',
-  },
-  searchContainer: {
-    padding: 16,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  searchInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: scaleFontSize(16),
-    backgroundColor: '#f5f5f5',
-    minHeight: MIN_TOUCH_TARGET_SIZE,
-  },
-  categoryScroll: {
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  categoryContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 8,
-  },
-  categoryButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#f5f5f5',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    minHeight: MIN_TOUCH_TARGET_SIZE,
-    justifyContent: 'center',
-  },
-  categoryButtonActive: {
-    backgroundColor: '#003366',
-    borderColor: '#003366',
-  },
-  categoryButtonText: {
-    fontSize: scaleFontSize(14),
-    color: '#666',
-    fontWeight: '500',
-  },
-  categoryButtonTextActive: {
-    color: '#ffffff',
-    fontWeight: 'bold',
-  },
-  termsList: {
-    flex: 1,
-    padding: 16,
-  },
-  termCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  termHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 8,
-  },
-  termTitle: {
-    fontSize: scaleFontSize(16),
-    fontWeight: 'bold',
-    color: '#003366',
-    flex: 1,
-    marginRight: 8,
-  },
-  categoryBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  categoryBadgeText: {
-    fontSize: scaleFontSize(11),
-    color: '#ffffff',
-    fontWeight: '600',
-  },
-  termDefinition: {
-    fontSize: scaleFontSize(14),
-    color: '#333',
-    lineHeight: scaleFontSize(20),
-  },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 40,
-    marginTop: 40,
-  },
-  emptyStateIcon: {
-    fontSize: 64,
-    marginBottom: 16,
-  },
-  emptyStateText: {
-    fontSize: scaleFontSize(18),
-    fontWeight: '600',
-    color: '#666',
-    marginBottom: 8,
-  },
-  emptyStateSubtext: {
-    fontSize: scaleFontSize(14),
-    color: '#999',
-    textAlign: 'center',
-  },
-});
 
 export default GlossaryScreen;

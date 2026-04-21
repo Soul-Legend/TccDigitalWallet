@@ -19,7 +19,6 @@ export function useHolderState() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [credentials, setCredentials] = useState<VerifiableCredential[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoadingCredentials, setIsLoadingCredentials] = useState(true);
 
   // Presentation request state
@@ -49,7 +48,6 @@ export function useHolderState() {
       }
 
       setCredentials(parsedCredentials);
-      setCurrentIndex(parsedCredentials.length > 0 ? 0 : -1);
     } catch (err) {
       console.error('Failed to load credentials:', err);
       setError('Erro ao carregar credenciais armazenadas');
@@ -115,22 +113,10 @@ export function useHolderState() {
     }
   }, [credentialInput, loadCredentials]);
 
-  const handlePrevious = useCallback(() => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    }
-  }, [currentIndex]);
-
-  const handleNext = useCallback(() => {
-    if (currentIndex < credentials.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    }
-  }, [currentIndex, credentials.length]);
-
-  const handleDeleteCredential = useCallback(() => {
+  const handleDeleteCredential = useCallback((index: number) => {
     Alert.alert(
       'Excluir Credencial',
-      'Tem certeza que deseja excluir esta credencial?',
+      'Tem certeza que deseja excluir esta credencial? Esta ação não pode ser desfeita.',
       [
         {text: 'Cancelar', style: 'cancel'},
         {
@@ -138,7 +124,7 @@ export function useHolderState() {
           style: 'destructive',
           onPress: async () => {
             try {
-              await StorageService.deleteCredential(currentIndex);
+              await StorageService.deleteCredential(index);
               await loadCredentials();
               setSuccess('Credencial excluída com sucesso');
               setTimeout(() => setSuccess(null), 3000);
@@ -149,7 +135,7 @@ export function useHolderState() {
         },
       ],
     );
-  }, [currentIndex, loadCredentials]);
+  }, [loadCredentials]);
 
   const handleProcessRequest = useCallback(async () => {
     if (!requestInput.trim()) {
@@ -167,7 +153,7 @@ export function useHolderState() {
     setSuccess(null);
 
     try {
-      const credential = credentials[currentIndex];
+      const credential = credentials[0];
       const consent = await PresentationService.processPEXRequest(
         requestInput.trim(),
         credential,
@@ -193,7 +179,7 @@ export function useHolderState() {
     } finally {
       setIsProcessingRequest(false);
     }
-  }, [requestInput, credentials, currentIndex]);
+  }, [requestInput, credentials]);
 
   const handleAttributeToggle = useCallback((attribute: string) => {
     if (!consentData) {return;}
@@ -215,12 +201,11 @@ export function useHolderState() {
       return;
     }
 
-    setShowConsentModal(false);
     setIsProcessingRequest(true);
     setError(null);
 
     try {
-      const credential = credentials[currentIndex];
+      const credential = credentials[0];
       const hasPredicates = consentData.predicates && consentData.predicates.length > 0;
 
       let presentation;
@@ -251,14 +236,16 @@ export function useHolderState() {
       setCurrentRequest(null);
       setConsentData(null);
       setSelectedAttributes([]);
+      setShowConsentModal(false);
       setTimeout(() => setSuccess(null), 3000);
     } catch (err: any) {
       const errorMessage = err.message || 'Erro ao criar apresentação';
       setError(errorMessage);
+      setShowConsentModal(false);
     } finally {
       setIsProcessingRequest(false);
     }
-  }, [currentRequest, consentData, credentials, currentIndex, selectedAttributes, transportMode]);
+  }, [currentRequest, consentData, credentials, selectedAttributes, transportMode]);
 
   const handleCancelConsent = useCallback(() => {
     setShowConsentModal(false);
@@ -295,7 +282,6 @@ export function useHolderState() {
     error,
     success,
     credentials,
-    currentIndex,
     isLoadingCredentials,
 
     // Presentation state
@@ -310,8 +296,6 @@ export function useHolderState() {
 
     // Actions
     handleStoreCredential,
-    handlePrevious,
-    handleNext,
     handleDeleteCredential,
     handleProcessRequest,
     handleAttributeToggle,

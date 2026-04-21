@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useCallback} from 'react';
+import React, {useEffect, useMemo, useCallback, useState} from 'react';
 import {
   View,
   Text,
@@ -6,15 +6,102 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
+  RefreshControl,
 } from 'react-native';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
 import {useAppStore} from '../stores/useAppStore';
 import LogEntry from '../components/LogEntry';
 import type {LogEntry as LogEntryType} from '../types';
+import {getTheme, scaleFontSize} from '../utils/theme';
+import type {Theme} from '../utils/theme';
+
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    header: {
+      backgroundColor: theme.colors.primary,
+      padding: theme.spacing.lg,
+      paddingTop: theme.spacing.lg,
+      ...(theme.shadows.large as any),
+    },
+    title: {
+      fontSize: scaleFontSize(theme.typography.fontSizeTitle),
+      fontWeight: 'bold',
+      color: theme.colors.surface,
+      marginBottom: theme.spacing.xs,
+    },
+    subtitle: {
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      color: theme.colors.primaryLight,
+      marginBottom: theme.spacing.md,
+    },
+    statsContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginTop: theme.spacing.sm,
+    },
+    statsText: {
+      fontSize: scaleFontSize(theme.typography.fontSizeSmall),
+      color: theme.colors.primaryLight,
+    },
+    clearButton: {
+      backgroundColor: theme.colors.error,
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.sm,
+      borderRadius: theme.borderRadius.small,
+    },
+    clearButtonText: {
+      color: theme.colors.surface,
+      fontSize: scaleFontSize(theme.typography.fontSizeSmall),
+      fontWeight: '600',
+    },
+    emptyContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: theme.spacing.xl,
+    },
+    emptyIcon: {
+      fontSize: 64,
+      marginBottom: theme.spacing.md,
+    },
+    emptyText: {
+      fontSize: scaleFontSize(theme.typography.fontSizeLarge + 2),
+      fontWeight: 'bold',
+      color: theme.colors.textSecondary,
+      marginBottom: theme.spacing.sm,
+    },
+    emptySubtext: {
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      color: theme.colors.textDisabled,
+      textAlign: 'center',
+      lineHeight: scaleFontSize(theme.typography.lineHeightBase),
+    },
+    logsList: {
+      flex: 1,
+    },
+    logsListContent: {
+      paddingVertical: theme.spacing.md,
+    },
+  });
 
 const LogsScreen: React.FC = () => {
   const setCurrentModule = useAppStore(state => state.setCurrentModule);
   const logs = useAppStore(state => state.logs);
   const clearLogs = useAppStore(state => state.clearLogs);
+  const theme = getTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    // Logs are already reactive via zustand; the brief spinner gives visual feedback
+    setTimeout(() => setRefreshing(false), 500);
+  }, []);
 
   useEffect(() => {
     setCurrentModule('logs');
@@ -56,11 +143,17 @@ const LogsScreen: React.FC = () => {
           Monitoramento de eventos criptográficos
         </Text>
         <View style={styles.statsContainer}>
-          <Text style={styles.statsText}>Total de eventos: {logs.length}</Text>
+          <Text
+            style={styles.statsText}
+            accessibilityLabel={`Total de eventos: ${logs.length}`}>
+            Total de eventos: {logs.length}
+          </Text>
           {logs.length > 0 && (
             <TouchableOpacity
               style={styles.clearButton}
-              onPress={handleClearLogs}>
+              onPress={handleClearLogs}
+              accessibilityLabel="Limpar histórico de logs"
+              accessibilityRole="button">
               <Text style={styles.clearButtonText}>Limpar Histórico</Text>
             </TouchableOpacity>
           )}
@@ -69,7 +162,7 @@ const LogsScreen: React.FC = () => {
 
       {logs.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyIcon}>📋</Text>
+          <MaterialCommunityIcons name="clipboard-text" size={64} color={theme.colors.textSecondary} style={{marginBottom: theme.spacing.md}} />
           <Text style={styles.emptyText}>Nenhum evento registrado</Text>
           <Text style={styles.emptySubtext}>
             Os eventos criptográficos aparecerão aqui conforme você utiliza o
@@ -87,87 +180,19 @@ const LogsScreen: React.FC = () => {
           maxToRenderPerBatch={20}
           windowSize={10}
           removeClippedSubviews
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[theme.colors.primary]}
+              tintColor={theme.colors.primary}
+            />
+          }
+          accessibilityLabel="Lista de logs de eventos"
         />
       )}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    backgroundColor: '#003366',
-    padding: 20,
-    paddingTop: 24,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#b3d9ff',
-    marginBottom: 12,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  statsText: {
-    fontSize: 13,
-    color: '#b3d9ff',
-  },
-  clearButton: {
-    backgroundColor: '#f44336',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 6,
-  },
-  clearButtonText: {
-    color: '#ffffff',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 40,
-  },
-  emptyIcon: {
-    fontSize: 64,
-    marginBottom: 16,
-  },
-  emptyText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#666',
-    marginBottom: 8,
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: '#999',
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  logsList: {
-    flex: 1,
-  },
-  logsListContent: {
-    paddingVertical: 12,
-  },
-});
 
 export default LogsScreen;

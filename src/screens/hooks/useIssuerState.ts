@@ -117,6 +117,7 @@ export function useIssuerState() {
       await TrustChainService.initializeRootIssuer(rootDid, 'UFSC - Âncora Raiz');
       await loadTrustChain();
       setSuccessMessage('Âncora raiz da cadeia de confiança inicializada!');
+      setTimeout(() => setSuccessMessage(null), 5000);
       addLog({
         operation: 'trust_chain_init',
         module: Module.ISSUER,
@@ -163,6 +164,7 @@ export function useIssuerState() {
       setChildName('');
       setSelectedParentDid(null);
       setSuccessMessage(`Emissor "${registeredName}" registrado sob ${parentDid}!`);
+      setTimeout(() => setSuccessMessage(null), 5000);
       addLog({
         operation: 'trust_chain_register',
         module: Module.ISSUER,
@@ -260,6 +262,7 @@ export function useIssuerState() {
       setSuccessMessage(
         `Credencial ${credentialFormat.toUpperCase()} emitida com sucesso! Token copiado para a área de transferência.`,
       );
+      setTimeout(() => setSuccessMessage(null), 5000);
       resetForm();
     } catch (error) {
       const errorMessage =

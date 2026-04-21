@@ -127,6 +127,56 @@ export const defaultTheme: Theme = {
 };
 
 /**
+ * Dark theme
+ */
+export const darkTheme: Theme = {
+  ...defaultTheme,
+  colors: {
+    primary: '#4d94ff',
+    primaryDark: '#003366',
+    primaryLight: '#80b3ff',
+    secondary: '#64b5f6',
+    background: '#121212',
+    surface: '#1e1e1e',
+    error: '#ef5350',
+    errorLight: '#3d1a1a',
+    success: '#66bb6a',
+    successLight: '#1a3d1a',
+    warning: '#ffa726',
+    warningLight: '#3d2e1a',
+    text: '#e0e0e0',
+    textSecondary: '#aaaaaa',
+    textDisabled: '#666666',
+    border: '#333333',
+    divider: '#2a2a2a',
+    overlay: 'rgba(0, 0, 0, 0.7)',
+  },
+  shadows: {
+    small: {
+      shadowColor: '#000',
+      shadowOffset: {width: 0, height: 1},
+      shadowOpacity: 0.3,
+      shadowRadius: 2,
+      elevation: 1,
+    },
+    medium: {
+      shadowColor: '#000',
+      shadowOffset: {width: 0, height: 2},
+      shadowOpacity: 0.3,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    large: {
+      shadowColor: '#000',
+      shadowOffset: {width: 0, height: 4},
+      shadowOpacity: 0.4,
+      shadowRadius: 8,
+      elevation: 4,
+    },
+  },
+};
+
+/**
  * High contrast theme for accessibility
  */
 export const highContrastTheme: Theme = {
@@ -180,13 +230,28 @@ export const getResponsiveSpacing = (baseSpacing: number): number => {
 /**
  * Theme hook (simplified - in production use Context API)
  */
+export type ThemeMode = 'light' | 'dark';
+
 let currentTheme: Theme = defaultTheme;
 let isHighContrast = false;
+let currentMode: ThemeMode = 'light';
+
+const resolveTheme = (): Theme => {
+  if (isHighContrast) {return highContrastTheme;}
+  return currentMode === 'dark' ? darkTheme : defaultTheme;
+};
 
 export const setHighContrastMode = (enabled: boolean): void => {
   isHighContrast = enabled;
-  currentTheme = enabled ? highContrastTheme : defaultTheme;
+  currentTheme = resolveTheme();
 };
+
+export const setThemeMode = (mode: ThemeMode): void => {
+  currentMode = mode;
+  currentTheme = resolveTheme();
+};
+
+export const getThemeMode = (): ThemeMode => currentMode;
 
 export const getTheme = (): Theme => currentTheme;
 

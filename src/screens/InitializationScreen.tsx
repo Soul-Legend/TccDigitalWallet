@@ -1,25 +1,160 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
+  Animated,
 } from 'react-native';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
 import {useRouter} from 'expo-router';
 import DIDService from '../services/DIDService';
 import StorageService from '../services/StorageService';
 import {useAppStore} from '../stores/useAppStore';
 import {Routes} from '../utils/routes';
+import {getTheme, scaleFontSize, Theme} from '../utils/theme';
 
 type InitializationState = 'checking' | 'generating' | 'success' | 'error';
 
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    header: {
+      backgroundColor: theme.colors.primary,
+      padding: theme.spacing.lg,
+      alignItems: 'center',
+    },
+    title: {
+      fontSize: scaleFontSize(theme.typography.fontSizeTitle),
+      fontWeight: 'bold',
+      color: theme.colors.surface,
+      marginBottom: theme.spacing.sm,
+    },
+    subtitle: {
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      color: theme.colors.textSecondary,
+    },
+    contentContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: theme.spacing.lg,
+    },
+    loadingText: {
+      fontSize: scaleFontSize(theme.typography.fontSizeLarge + 2),
+      color: theme.colors.primary,
+      marginTop: theme.spacing.lg,
+      fontWeight: '600',
+    },
+    subText: {
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      color: theme.colors.textSecondary,
+      marginTop: theme.spacing.sm,
+    },
+    successIcon: {
+      fontSize: 80,
+      color: theme.colors.success,
+      marginBottom: theme.spacing.lg,
+    },
+    successTitle: {
+      fontSize: scaleFontSize(theme.typography.fontSizeXLarge + 2),
+      fontWeight: 'bold',
+      color: theme.colors.primary,
+      marginBottom: theme.spacing.lg,
+      textAlign: 'center',
+    },
+    didContainer: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borderRadius.medium,
+      padding: theme.spacing.md,
+      marginBottom: theme.spacing.lg,
+      width: '100%',
+      ...(theme.shadows.medium as object),
+    },
+    didLabel: {
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      fontWeight: '600',
+      color: theme.colors.primary,
+      marginBottom: theme.spacing.sm,
+    },
+    didText: {
+      fontSize: scaleFontSize(theme.typography.fontSizeSmall),
+      color: theme.colors.text,
+      fontFamily: 'monospace',
+    },
+    infoText: {
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      color: theme.colors.textSecondary,
+      textAlign: 'center',
+      marginBottom: theme.spacing.xl - 2,
+      lineHeight: theme.typography.lineHeightBase,
+    },
+    continueButton: {
+      backgroundColor: theme.colors.primary,
+      paddingVertical: theme.spacing.md - 2,
+      paddingHorizontal: theme.spacing.xl + 8,
+      borderRadius: theme.borderRadius.medium,
+      ...(theme.shadows.medium as object),
+    },
+    continueButtonText: {
+      color: theme.colors.surface,
+      fontSize: scaleFontSize(theme.typography.fontSizeLarge),
+      fontWeight: 'bold',
+    },
+    errorIcon: {
+      fontSize: 80,
+      color: theme.colors.error,
+      marginBottom: theme.spacing.lg,
+    },
+    errorTitle: {
+      fontSize: scaleFontSize(theme.typography.fontSizeXLarge + 2),
+      fontWeight: 'bold',
+      color: theme.colors.error,
+      marginBottom: theme.spacing.lg,
+      textAlign: 'center',
+    },
+    errorText: {
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      color: theme.colors.textSecondary,
+      textAlign: 'center',
+      marginBottom: theme.spacing.xl - 2,
+      paddingHorizontal: theme.spacing.lg,
+    },
+    retryButton: {
+      backgroundColor: theme.colors.error,
+      paddingVertical: theme.spacing.md - 2,
+      paddingHorizontal: theme.spacing.xl + 8,
+      borderRadius: theme.borderRadius.medium,
+      ...(theme.shadows.medium as object),
+    },
+    retryButtonText: {
+      color: theme.colors.surface,
+      fontSize: scaleFontSize(theme.typography.fontSizeLarge),
+      fontWeight: 'bold',
+    },
+  });
+
 const InitializationScreen: React.FC = () => {
+  const theme = getTheme();
+  const styles = createStyles(theme);
   const router = useRouter();
   const [initState, setInitState] = useState<InitializationState>('checking');
   const [generatedDID, setGeneratedDID] = useState<string>('');
   const [error, setError] = useState<string>('');
   const setHolderDID = useAppStore(appState => appState.setHolderDID);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 600,
+      useNativeDriver: true,
+    }).start();
+  }, [fadeAnim]);
 
   const generateIdentity = async () => {
     try {
@@ -86,7 +221,7 @@ const InitializationScreen: React.FC = () => {
       case 'checking':
         return (
           <View style={styles.contentContainer}>
-            <ActivityIndicator size="large" color="#003366" />
+            <ActivityIndicator size="large" color={theme.colors.primary} />
             <Text style={styles.loadingText}>
               Verificando inicialização...
             </Text>
@@ -96,7 +231,7 @@ const InitializationScreen: React.FC = () => {
       case 'generating':
         return (
           <View style={styles.contentContainer}>
-            <ActivityIndicator size="large" color="#003366" />
+            <ActivityIndicator size="large" color={theme.colors.primary} />
             <Text style={styles.loadingText}>
               Gerando sua identidade digital...
             </Text>
@@ -109,7 +244,7 @@ const InitializationScreen: React.FC = () => {
       case 'success':
         return (
           <View style={styles.contentContainer}>
-            <Text style={styles.successIcon}>✓</Text>
+            <MaterialCommunityIcons name="check-circle" size={80} color={theme.colors.success} style={{marginBottom: theme.spacing.lg}} />
             <Text style={styles.successTitle}>
               Identidade Gerada com Sucesso!
             </Text>
@@ -134,7 +269,7 @@ const InitializationScreen: React.FC = () => {
       case 'error':
         return (
           <View style={styles.contentContainer}>
-            <Text style={styles.errorIcon}>⚠</Text>
+            <MaterialCommunityIcons name="alert" size={80} color={theme.colors.error} style={{marginBottom: theme.spacing.lg}} />
             <Text style={styles.errorTitle}>Erro na Inicialização</Text>
             <Text style={styles.errorText}>{error}</Text>
             <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
@@ -150,145 +285,23 @@ const InitializationScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <Animated.View style={[styles.header, {opacity: fadeAnim}]}>
+        <MaterialCommunityIcons
+          name="shield-check"
+          size={48}
+          color={theme.colors.surface}
+          style={{marginBottom: theme.spacing.sm}}
+        />
         <Text style={styles.title}>Carteira Digital SSI</Text>
-        <Text style={styles.subtitle}>Primeira Inicialização</Text>
-      </View>
-      {renderContent()}
+        <Text style={styles.subtitle}>Identidade Acadêmica Verificável</Text>
+      </Animated.View>
+      <Animated.View style={{flex: 1, opacity: fadeAnim}}>
+        {renderContent()}
+      </Animated.View>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    backgroundColor: '#003366',
-    padding: 20,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#ccc',
-  },
-  contentContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  loadingText: {
-    fontSize: 18,
-    color: '#003366',
-    marginTop: 20,
-    fontWeight: '600',
-  },
-  subText: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 8,
-  },
-  successIcon: {
-    fontSize: 80,
-    color: '#4CAF50',
-    marginBottom: 20,
-  },
-  successTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#003366',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  didContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 20,
-    width: '100%',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  didLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#003366',
-    marginBottom: 8,
-  },
-  didText: {
-    fontSize: 12,
-    color: '#333',
-    fontFamily: 'monospace',
-  },
-  infoText: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 30,
-    lineHeight: 20,
-  },
-  continueButton: {
-    backgroundColor: '#003366',
-    paddingVertical: 14,
-    paddingHorizontal: 40,
-    borderRadius: 8,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-  },
-  continueButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  errorIcon: {
-    fontSize: 80,
-    color: '#f44336',
-    marginBottom: 20,
-  },
-  errorTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#f44336',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  errorText: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 30,
-    paddingHorizontal: 20,
-  },
-  retryButton: {
-    backgroundColor: '#f44336',
-    paddingVertical: 14,
-    paddingHorizontal: 40,
-    borderRadius: 8,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-  },
-  retryButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-});
+
 
 export default InitializationScreen;

@@ -6,9 +6,9 @@ import LogServiceInstance from './LogService';
 import type {ILogService} from '../types';
 
 // @noble/ed25519 v3+ requires configuring SHA-512 (no crypto.subtle in RN)
-ed.hashes.sha512 = sha512;
+ed.hashes.sha512 = (msg) => sha512(msg) as Uint8Array<ArrayBuffer>;
 ed.hashes.sha512Async = async (...msgs: Uint8Array[]) =>
-  sha512(ed.etc.concatBytes(...msgs));
+  sha512(ed.etc.concatBytes(...msgs)) as Uint8Array<ArrayBuffer>;
 
 /**
  * CryptoService - Handles cryptographic operations
