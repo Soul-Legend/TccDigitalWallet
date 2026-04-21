@@ -23,20 +23,20 @@ const createStyles = (theme: Theme) =>
       backgroundColor: theme.colors.background,
     },
     header: {
-      backgroundColor: theme.colors.primary,
-      padding: theme.spacing.lg,
-      paddingTop: theme.spacing.lg,
-      ...(theme.shadows.large as any),
+      paddingHorizontal: theme.spacing.md,
+      paddingTop: theme.spacing.md,
+      paddingBottom: theme.spacing.lg,
     },
     title: {
-      fontSize: scaleFontSize(theme.typography.fontSizeTitle),
-      fontWeight: 'bold',
-      color: theme.colors.surface,
+      fontSize: scaleFontSize(32),
+      fontWeight: '900',
+      color: theme.colors.primaryDark,
       marginBottom: theme.spacing.xs,
+      letterSpacing: -0.5,
     },
     subtitle: {
-      fontSize: scaleFontSize(theme.typography.fontSizeBase),
-      color: theme.colors.primaryLight,
+      fontSize: scaleFontSize(theme.typography.fontSizeLarge),
+      color: theme.colors.textSecondary,
       marginBottom: theme.spacing.md,
     },
     statsContainer: {
@@ -47,7 +47,7 @@ const createStyles = (theme: Theme) =>
     },
     statsText: {
       fontSize: scaleFontSize(theme.typography.fontSizeSmall),
-      color: theme.colors.primaryLight,
+      color: theme.colors.textSecondary,
     },
     clearButton: {
       backgroundColor: theme.colors.error,
@@ -56,12 +56,12 @@ const createStyles = (theme: Theme) =>
       borderRadius: theme.borderRadius.small,
     },
     clearButtonText: {
-      color: theme.colors.surface,
+      color: '#FFFFFF',
       fontSize: scaleFontSize(theme.typography.fontSizeSmall),
       fontWeight: '600',
     },
     copyErrorsButton: {
-      backgroundColor: theme.colors.primary,
+      backgroundColor: theme.colors.primaryContainer,
       paddingHorizontal: theme.spacing.md,
       paddingVertical: theme.spacing.sm,
       borderRadius: theme.borderRadius.small,
@@ -70,7 +70,7 @@ const createStyles = (theme: Theme) =>
       marginRight: theme.spacing.sm,
     },
     copyErrorsButtonText: {
-      color: theme.colors.surface,
+      color: theme.colors.onPrimary,
       fontSize: scaleFontSize(theme.typography.fontSizeSmall),
       fontWeight: '600',
       marginLeft: 4,
@@ -105,7 +105,8 @@ const createStyles = (theme: Theme) =>
       flex: 1,
     },
     logsListContent: {
-      paddingVertical: theme.spacing.md,
+      paddingVertical: theme.spacing.sm,
+      paddingHorizontal: theme.spacing.md,
     },
   });
 
@@ -199,9 +200,9 @@ const LogsScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Painel de Logs</Text>
+        <Text style={styles.title}>Atividades de Segurança</Text>
         <Text style={styles.subtitle}>
-          Monitoramento de eventos criptográficos
+          Registro de eventos criptográficos da Carteira Digital SSI
         </Text>
         <View style={styles.statsContainer}>
           <Text

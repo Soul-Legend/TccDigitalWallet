@@ -319,17 +319,22 @@ class CredentialService {
       // can look up the matching private key in Askar.
       const signingKey = getKeyFromVerificationMethod(verificationMethod);
 
-      // Resolve wallet via either the public (`agent.wallet`) or context
-      // (`agent.context.wallet`) surface depending on the Credo version /
-      // mock in use.
+      // Resolve the underlying Wallet (with sign()) — NOT the WalletApi wrapper.
+      // `agent.wallet` is WalletApi (no sign()), `agent.context.wallet` is the
+      // actual Wallet interface that exposes sign().
       type WalletSignArg = {data: Buffer; key: unknown};
       type WalletLike = {
         sign: (arg: WalletSignArg) => Promise<Buffer>;
       };
+      const agentAny = agent as any;
       const wallet: WalletLike | undefined =
-        (agent as {wallet?: WalletLike}).wallet ??
-        (agent as {context?: {wallet?: WalletLike}}).context?.wallet;
-      if (!wallet || typeof wallet.sign !== 'function') {
+        (typeof agentAny.context?.wallet?.sign === 'function'
+          ? agentAny.context.wallet
+          : undefined) ??
+        (typeof agentAny.wallet?.sign === 'function'
+          ? agentAny.wallet
+          : undefined);
+      if (!wallet) {
         throw new CryptoError(
           'Credo wallet sign API unavailable',
           'signature',
@@ -664,13 +669,21 @@ class CredentialService {
         }
       }
 
+      // Extract the base issuer DID from the cred_def_id.
+      // Format: {issuerDid}:3:CL:{...}  — the issuer DID is everything
+      // before the first ':3:CL:' segment.
+      const clSeparator = ':3:CL:';
+      const issuerFromCredDef = credDefId.includes(clSeparator)
+        ? credDefId.substring(0, credDefId.indexOf(clSeparator))
+        : credDefId;
+
       const credential: VerifiableCredential = {
         '@context': [
           'https://www.w3.org/2018/credentials/v1',
           'https://w3id.org/security/suites/jws-2020/v1',
         ],
         type: ['VerifiableCredential', 'AcademicIDCredential'],
-        issuer: credDefId,
+        issuer: issuerFromCredDef,
         issuanceDate: new Date().toISOString(),
         credentialSubject,
         proof: {

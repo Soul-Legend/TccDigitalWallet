@@ -255,36 +255,41 @@ const LogEntry: React.FC<LogEntryProps> = ({log}) => {
 
 const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.medium,
-    padding: theme.spacing.md,
-    marginVertical: 6,
-    marginHorizontal: 12,
-    ...(theme.shadows.medium as any),
-    borderLeftWidth: 4,
-    borderLeftColor: theme.colors.success,
+    backgroundColor: theme.colors.surfaceContainerLowest,
+    borderRadius: theme.borderRadius.large,
+    padding: theme.spacing.lg,
+    marginVertical: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(195,198,213,0.2)',
+    borderLeftWidth: 3,
+    borderLeftColor: theme.colors.tertiaryContainer,
+    overflow: 'hidden',
   },
   errorContainer: {
     borderLeftColor: theme.colors.error,
-    backgroundColor: theme.colors.errorLight,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: theme.spacing.sm,
+    marginBottom: theme.spacing.xs,
   },
   headerLeft: {
     flex: 1,
   },
   headerRight: {
     marginLeft: 12,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   operationText: {
     fontSize: scaleFontSize(16),
     fontWeight: 'bold',
-    color: theme.colors.primary,
-    marginBottom: theme.spacing.xs,
+    color: theme.colors.text,
+    marginBottom: 2,
   },
   moduleText: {
     fontSize: scaleFontSize(13),
@@ -292,7 +297,8 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   timestamp: {
     fontSize: scaleFontSize(12),
-    color: theme.colors.textDisabled,
+    color: theme.colors.textSecondary,
+    fontWeight: '600',
     marginBottom: theme.spacing.sm,
   },
   statusBadge: {
@@ -330,6 +336,8 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     color: theme.colors.textSecondary,
     marginBottom: theme.spacing.xs,
     fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   detailValue: {
     fontSize: scaleFontSize(14),
@@ -337,7 +345,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   detailValueMono: {
     fontSize: scaleFontSize(13),
-    color: theme.colors.text,
+    color: theme.colors.textSecondary,
     fontFamily: 'monospace',
   },
   successText: {
@@ -349,7 +357,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     fontWeight: 'bold',
   },
   parametersContainer: {
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.surfaceContainerHighest,
     padding: theme.spacing.sm,
     borderRadius: theme.borderRadius.small,
     marginTop: theme.spacing.xs,
@@ -373,7 +381,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     fontSize: scaleFontSize(11),
     color: theme.colors.textSecondary,
     fontFamily: 'monospace',
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.surfaceContainerHighest,
     padding: theme.spacing.sm,
     borderRadius: theme.borderRadius.small,
     marginTop: theme.spacing.xs,

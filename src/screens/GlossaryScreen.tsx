@@ -40,52 +40,51 @@ const createStyles = (theme: Theme) =>
       backgroundColor: theme.colors.background,
     },
     header: {
-      backgroundColor: theme.colors.primary,
-      padding: theme.spacing.lg,
-      paddingTop: theme.spacing.lg,
+      paddingHorizontal: theme.spacing.md,
+      paddingTop: theme.spacing.md,
+      paddingBottom: theme.spacing.lg,
     },
     title: {
-      fontSize: scaleFontSize(theme.typography.fontSizeTitle),
+      fontSize: scaleFontSize(32),
       fontWeight: 'bold',
-      color: theme.colors.surface,
+      color: theme.colors.primaryDark,
       marginBottom: theme.spacing.xs,
+      letterSpacing: -0.5,
     },
     subtitle: {
-      fontSize: scaleFontSize(theme.typography.fontSizeBase),
-      color: theme.colors.primaryLight,
+      fontSize: scaleFontSize(theme.typography.fontSizeLarge),
+      color: theme.colors.textSecondary,
+      lineHeight: 22,
     },
     searchContainer: {
-      padding: theme.spacing.md,
-      backgroundColor: theme.colors.surface,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.divider,
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.sm,
     },
     searchInput: {
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-      borderRadius: theme.borderRadius.medium,
+      borderWidth: 0,
+      borderRadius: theme.borderRadius.small,
       padding: theme.spacing.md,
-      fontSize: scaleFontSize(theme.typography.fontSizeLarge),
-      backgroundColor: theme.colors.background,
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      backgroundColor: theme.colors.surfaceContainerHighest,
       minHeight: MIN_TOUCH_TARGET_SIZE,
+      color: theme.colors.text,
     },
     categoryScroll: {
-      backgroundColor: theme.colors.surface,
       borderBottomWidth: 1,
       borderBottomColor: theme.colors.divider,
     },
     categoryContainer: {
       paddingHorizontal: theme.spacing.md,
-      paddingVertical: theme.spacing.md,
+      paddingVertical: theme.spacing.sm,
       gap: theme.spacing.sm,
     },
     categoryButton: {
       paddingHorizontal: theme.spacing.md,
       paddingVertical: theme.spacing.sm,
       borderRadius: 20,
-      backgroundColor: theme.colors.background,
+      backgroundColor: theme.colors.surfaceContainerLow,
       borderWidth: 1,
-      borderColor: theme.colors.border,
+      borderColor: 'rgba(195,198,213,0.2)',
       minHeight: MIN_TOUCH_TARGET_SIZE,
       justifyContent: 'center',
     },
@@ -99,7 +98,7 @@ const createStyles = (theme: Theme) =>
       fontWeight: '500',
     },
     categoryButtonTextActive: {
-      color: theme.colors.surface,
+      color: theme.colors.onPrimary,
       fontWeight: 'bold',
     },
     termsList: {
@@ -107,11 +106,12 @@ const createStyles = (theme: Theme) =>
       padding: theme.spacing.md,
     },
     termCard: {
-      backgroundColor: theme.colors.surface,
-      borderRadius: theme.borderRadius.medium,
-      padding: theme.spacing.md,
+      backgroundColor: theme.colors.surfaceContainerLow,
+      borderRadius: theme.borderRadius.large,
+      padding: theme.spacing.lg,
       marginBottom: theme.spacing.md,
-      ...(theme.shadows.medium as any),
+      borderWidth: 1,
+      borderColor: 'rgba(195,198,213,0.2)',
     },
     termHeader: {
       flexDirection: 'row',
@@ -120,11 +120,12 @@ const createStyles = (theme: Theme) =>
       marginBottom: theme.spacing.sm,
     },
     termTitle: {
-      fontSize: scaleFontSize(theme.typography.fontSizeLarge),
+      fontSize: scaleFontSize(theme.typography.fontSizeXLarge),
       fontWeight: 'bold',
       color: theme.colors.primary,
       flex: 1,
       marginRight: theme.spacing.sm,
+      letterSpacing: -0.3,
     },
     categoryBadge: {
       paddingHorizontal: theme.spacing.sm,
@@ -133,13 +134,13 @@ const createStyles = (theme: Theme) =>
     },
     categoryBadgeText: {
       fontSize: scaleFontSize(theme.typography.fontSizeSmall - 1),
-      color: theme.colors.surface,
+      color: '#FFFFFF',
       fontWeight: '600',
     },
     termDefinition: {
       fontSize: scaleFontSize(theme.typography.fontSizeBase),
       color: theme.colors.text,
-      lineHeight: scaleFontSize(theme.typography.lineHeightBase),
+      lineHeight: scaleFontSize(theme.typography.lineHeightBase + 4),
     },
     emptyState: {
       alignItems: 'center',
@@ -202,9 +203,9 @@ const GlossaryScreen: React.FC = () => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Glossário SSI</Text>
+        <Text style={styles.title}>Glossário</Text>
         <Text style={styles.subtitle}>
-          Termos e definições de Identidade Auto-Soberana
+          Terminologia oficial para a arquitetura de Identidade Autossoberana (SSI).
         </Text>
       </View>
 

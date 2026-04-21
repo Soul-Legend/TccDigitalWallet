@@ -24,15 +24,21 @@ const createStyles = (theme: Theme) =>
       backgroundColor: theme.colors.background,
     },
     header: {
-      backgroundColor: theme.colors.primary,
-      padding: theme.spacing.lg,
+      paddingTop: 48,
+      paddingBottom: theme.spacing.md,
       alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: 'row',
+      gap: 8,
+    },
+    headerIcon: {
+      marginRight: 4,
     },
     title: {
-      fontSize: scaleFontSize(theme.typography.fontSizeTitle),
+      fontSize: scaleFontSize(theme.typography.fontSizeXLarge),
       fontWeight: 'bold',
-      color: theme.colors.surface,
-      marginBottom: theme.spacing.sm,
+      color: theme.colors.primary,
+      letterSpacing: 0.5,
     },
     subtitle: {
       fontSize: scaleFontSize(theme.typography.fontSizeBase),
@@ -42,7 +48,7 @@ const createStyles = (theme: Theme) =>
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      padding: theme.spacing.lg,
+      paddingHorizontal: theme.spacing.lg,
     },
     loadingText: {
       fontSize: scaleFontSize(theme.typography.fontSizeLarge + 2),
@@ -55,84 +61,124 @@ const createStyles = (theme: Theme) =>
       color: theme.colors.textSecondary,
       marginTop: theme.spacing.sm,
     },
-    successIcon: {
-      fontSize: 80,
-      color: theme.colors.success,
+    successIconContainer: {
+      width: 96,
+      height: 96,
+      borderRadius: 48,
+      backgroundColor: theme.colors.tertiaryFixed,
+      alignItems: 'center',
+      justifyContent: 'center',
       marginBottom: theme.spacing.lg,
+      ...theme.shadows.large as object,
     },
     successTitle: {
-      fontSize: scaleFontSize(theme.typography.fontSizeXLarge + 2),
+      fontSize: scaleFontSize(28),
       fontWeight: 'bold',
-      color: theme.colors.primary,
-      marginBottom: theme.spacing.lg,
+      color: theme.colors.text,
+      marginBottom: theme.spacing.md,
       textAlign: 'center',
+      letterSpacing: -0.5,
+    },
+    successSubtitle: {
+      fontSize: scaleFontSize(theme.typography.fontSizeLarge),
+      color: theme.colors.textSecondary,
+      textAlign: 'center',
+      lineHeight: 24,
+      marginBottom: theme.spacing.xl,
+      maxWidth: 320,
     },
     didContainer: {
-      backgroundColor: theme.colors.surface,
-      borderRadius: theme.borderRadius.medium,
-      padding: theme.spacing.md,
-      marginBottom: theme.spacing.lg,
+      backgroundColor: theme.colors.surfaceContainerLow,
+      borderRadius: theme.borderRadius.large,
+      padding: theme.spacing.lg,
+      marginBottom: theme.spacing.xl,
       width: '100%',
-      ...(theme.shadows.medium as object),
+      borderLeftWidth: 4,
+      borderLeftColor: theme.colors.primary,
+    },
+    didLabelRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: theme.spacing.sm,
+      gap: 6,
     },
     didLabel: {
-      fontSize: scaleFontSize(theme.typography.fontSizeBase),
-      fontWeight: '600',
-      color: theme.colors.primary,
-      marginBottom: theme.spacing.sm,
+      fontSize: scaleFontSize(theme.typography.fontSizeSmall),
+      fontWeight: '700',
+      color: theme.colors.textSecondary,
+      textTransform: 'uppercase',
+      letterSpacing: 1,
+    },
+    didTextContainer: {
+      backgroundColor: theme.colors.surfaceContainerHighest,
+      borderRadius: theme.borderRadius.small,
+      padding: theme.spacing.md,
     },
     didText: {
       fontSize: scaleFontSize(theme.typography.fontSizeSmall),
-      color: theme.colors.text,
+      color: theme.colors.textSecondary,
       fontFamily: 'monospace',
     },
     infoText: {
       fontSize: scaleFontSize(theme.typography.fontSizeBase),
       color: theme.colors.textSecondary,
       textAlign: 'center',
-      marginBottom: theme.spacing.xl - 2,
-      lineHeight: theme.typography.lineHeightBase,
+      marginBottom: theme.spacing.xl,
+      lineHeight: theme.typography.lineHeightBase + 4,
+      maxWidth: 320,
     },
     continueButton: {
       backgroundColor: theme.colors.primary,
-      paddingVertical: theme.spacing.md - 2,
+      paddingVertical: theme.spacing.md,
       paddingHorizontal: theme.spacing.xl + 8,
-      borderRadius: theme.borderRadius.medium,
+      borderRadius: theme.borderRadius.large,
+      width: '100%',
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
       ...(theme.shadows.medium as object),
     },
     continueButtonText: {
-      color: theme.colors.surface,
+      color: theme.colors.onPrimary,
       fontSize: scaleFontSize(theme.typography.fontSizeLarge),
       fontWeight: 'bold',
     },
-    errorIcon: {
-      fontSize: 80,
-      color: theme.colors.error,
+    errorIconContainer: {
+      width: 96,
+      height: 96,
+      borderRadius: 48,
+      backgroundColor: theme.colors.errorLight,
+      alignItems: 'center',
+      justifyContent: 'center',
       marginBottom: theme.spacing.lg,
     },
     errorTitle: {
-      fontSize: scaleFontSize(theme.typography.fontSizeXLarge + 2),
+      fontSize: scaleFontSize(28),
       fontWeight: 'bold',
       color: theme.colors.error,
-      marginBottom: theme.spacing.lg,
+      marginBottom: theme.spacing.md,
       textAlign: 'center',
     },
     errorText: {
       fontSize: scaleFontSize(theme.typography.fontSizeBase),
       color: theme.colors.textSecondary,
       textAlign: 'center',
-      marginBottom: theme.spacing.xl - 2,
+      marginBottom: theme.spacing.xl,
       paddingHorizontal: theme.spacing.lg,
+      lineHeight: theme.typography.lineHeightBase + 4,
     },
     retryButton: {
       backgroundColor: theme.colors.error,
-      paddingVertical: theme.spacing.md - 2,
+      paddingVertical: theme.spacing.md,
       paddingHorizontal: theme.spacing.xl + 8,
-      borderRadius: theme.borderRadius.medium,
+      borderRadius: theme.borderRadius.large,
+      width: '100%',
+      alignItems: 'center',
       ...(theme.shadows.medium as object),
     },
     retryButtonText: {
-      color: theme.colors.surface,
+      color: '#FFFFFF',
       fontSize: scaleFontSize(theme.typography.fontSizeLarge),
       fontWeight: 'bold',
     },
@@ -244,24 +290,31 @@ const InitializationScreen: React.FC = () => {
       case 'success':
         return (
           <View style={styles.contentContainer}>
-            <MaterialCommunityIcons name="check-circle" size={80} color={theme.colors.success} style={{marginBottom: theme.spacing.lg}} />
+            <View style={styles.successIconContainer}>
+              <MaterialCommunityIcons name="check-circle" size={56} color={theme.colors.tertiary} />
+            </View>
             <Text style={styles.successTitle}>
-              Identidade Gerada com Sucesso!
+              Identidade Acadêmica Criada
+            </Text>
+            <Text style={styles.successSubtitle}>
+              Seu DID (Decentralized Identifier) foi gerado e armazenado com segurança no seu dispositivo.
             </Text>
             <View style={styles.didContainer}>
-              <Text style={styles.didLabel}>Seu DID:</Text>
-              <Text style={styles.didText} numberOfLines={3}>
-                {generatedDID}
-              </Text>
+              <View style={styles.didLabelRow}>
+                <MaterialCommunityIcons name="fingerprint" size={14} color={theme.colors.textSecondary} />
+                <Text style={styles.didLabel}>Seu Identificador Descentralizado</Text>
+              </View>
+              <View style={styles.didTextContainer}>
+                <Text style={styles.didText} numberOfLines={3}>
+                  {generatedDID}
+                </Text>
+              </View>
             </View>
-            <Text style={styles.infoText}>
-              Sua identidade digital foi criada e armazenada de forma segura no
-              dispositivo. Suas chaves privadas nunca sairão deste aparelho.
-            </Text>
             <TouchableOpacity
               style={styles.continueButton}
               onPress={handleContinue}>
               <Text style={styles.continueButtonText}>Continuar</Text>
+              <MaterialCommunityIcons name="arrow-right" size={20} color={theme.colors.onPrimary} />
             </TouchableOpacity>
           </View>
         );
@@ -269,7 +322,9 @@ const InitializationScreen: React.FC = () => {
       case 'error':
         return (
           <View style={styles.contentContainer}>
-            <MaterialCommunityIcons name="alert" size={80} color={theme.colors.error} style={{marginBottom: theme.spacing.lg}} />
+            <View style={styles.errorIconContainer}>
+              <MaterialCommunityIcons name="alert-circle" size={56} color={theme.colors.error} />
+            </View>
             <Text style={styles.errorTitle}>Erro na Inicialização</Text>
             <Text style={styles.errorText}>{error}</Text>
             <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
@@ -287,13 +342,12 @@ const InitializationScreen: React.FC = () => {
     <View style={styles.container}>
       <Animated.View style={[styles.header, {opacity: fadeAnim}]}>
         <MaterialCommunityIcons
-          name="shield-check"
-          size={48}
-          color={theme.colors.surface}
-          style={{marginBottom: theme.spacing.sm}}
+          name="school"
+          size={28}
+          color={theme.colors.primary}
+          style={styles.headerIcon}
         />
-        <Text style={styles.title}>Carteira Digital SSI</Text>
-        <Text style={styles.subtitle}>Identidade Acadêmica Verificável</Text>
+        <Text style={styles.title}>SSI Universitário</Text>
       </Animated.View>
       <Animated.View style={{flex: 1, opacity: fadeAnim}}>
         {renderContent()}

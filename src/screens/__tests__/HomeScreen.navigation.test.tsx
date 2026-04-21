@@ -11,7 +11,7 @@
  * clear message — without booting React.
  */
 
-import {readFileSync, readdirSync} from 'fs';
+import {readFileSync, readdirSync, existsSync} from 'fs';
 import {join} from 'path';
 import {Routes, type RouteName} from '../../utils/routes';
 
@@ -21,13 +21,29 @@ const APP_DIR = join(__dirname, '..', '..', '..', 'app');
 const KNOWN_ROUTES: ReadonlyArray<RouteName> = Object.keys(Routes) as RouteName[];
 const KNOWN_PATHS = new Set<string>(Object.values(Routes));
 
+/**
+ * Collect all .tsx basenames from the app dir, including layout groups like (tabs).
+ */
+function collectAppFiles(dir: string): string[] {
+  const entries = readdirSync(dir, {withFileTypes: true});
+  const files: string[] = [];
+  for (const entry of entries) {
+    if (entry.isFile() && entry.name.endsWith('.tsx')) {
+      files.push(entry.name);
+    } else if (entry.isDirectory()) {
+      files.push(...collectAppFiles(join(dir, entry.name)));
+    }
+  }
+  return files;
+}
+
 describe('HomeScreen — navigation contract', () => {
   let source: string;
   let appFiles: string[];
 
   beforeAll(() => {
     source = readFileSync(HOME_SCREEN_PATH, 'utf8');
-    appFiles = readdirSync(APP_DIR).filter(file => file.endsWith('.tsx'));
+    appFiles = collectAppFiles(APP_DIR);
   });
 
   it('declares only route names that exist in shared routes map', () => {

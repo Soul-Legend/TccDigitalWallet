@@ -10,9 +10,22 @@ export interface Theme {
     primary: string;
     primaryDark: string;
     primaryLight: string;
+    primaryContainer: string;
+    onPrimary: string;
+    onPrimaryContainer: string;
     secondary: string;
+    secondaryContainer: string;
+    onSecondaryContainer: string;
+    tertiary: string;
+    tertiaryContainer: string;
+    tertiaryFixed: string;
+    onTertiaryContainer: string;
     background: string;
     surface: string;
+    surfaceContainerLow: string;
+    surfaceContainerHigh: string;
+    surfaceContainerHighest: string;
+    surfaceContainerLowest: string;
     error: string;
     errorLight: string;
     success: string;
@@ -60,23 +73,36 @@ export interface Theme {
  */
 export const defaultTheme: Theme = {
   colors: {
-    primary: '#003366',
-    primaryDark: '#001a33',
-    primaryLight: '#004d99',
-    secondary: '#2196f3',
-    background: '#f5f5f5',
-    surface: '#ffffff',
-    error: '#c62828',
-    errorLight: '#ffebee',
-    success: '#2e7d32',
-    successLight: '#e8f5e9',
-    warning: '#f57c00',
-    warningLight: '#fff3e0',
-    text: '#333333',
-    textSecondary: '#666666',
-    textDisabled: '#999999',
-    border: '#dddddd',
-    divider: '#e0e0e0',
+    primary: '#1351B4',
+    primaryDark: '#003A8C',
+    primaryLight: '#225ABD',
+    primaryContainer: '#1351B4',
+    onPrimary: '#FFFFFF',
+    onPrimaryContainer: '#B8CBFF',
+    secondary: '#FECC03',
+    secondaryContainer: '#FECC03',
+    onSecondaryContainer: '#6E5700',
+    tertiary: '#004A09',
+    tertiaryContainer: '#006511',
+    tertiaryFixed: '#8FFB85',
+    onTertiaryContainer: '#79E370',
+    background: '#FCF9F8',
+    surface: '#FFFFFF',
+    surfaceContainerLow: '#F6F3F2',
+    surfaceContainerHigh: '#EAE7E7',
+    surfaceContainerHighest: '#E5E2E1',
+    surfaceContainerLowest: '#FFFFFF',
+    error: '#BA1A1A',
+    errorLight: '#FFDAD6',
+    success: '#006511',
+    successLight: '#8FFB85',
+    warning: '#745B00',
+    warningLight: '#FFE089',
+    text: '#1B1B1C',
+    textSecondary: '#434653',
+    textDisabled: '#737784',
+    border: '#C3C6D5',
+    divider: '#E5E2E1',
     overlay: 'rgba(0, 0, 0, 0.5)',
   },
   spacing: {
@@ -97,9 +123,9 @@ export const defaultTheme: Theme = {
     lineHeightLarge: 24,
   },
   borderRadius: {
-    small: 4,
-    medium: 8,
-    large: 12,
+    small: 8,
+    medium: 12,
+    large: 16,
   },
   shadows: {
     small: {
@@ -132,12 +158,26 @@ export const defaultTheme: Theme = {
 export const darkTheme: Theme = {
   ...defaultTheme,
   colors: {
-    primary: '#4d94ff',
-    primaryDark: '#003366',
+    ...defaultTheme.colors,
+    primary: '#B0C6FF',
+    primaryDark: '#003A8C',
     primaryLight: '#80b3ff',
-    secondary: '#64b5f6',
+    primaryContainer: '#1351B4',
+    onPrimary: '#001945',
+    onPrimaryContainer: '#B8CBFF',
+    secondary: '#F0C100',
+    secondaryContainer: '#574400',
+    onSecondaryContainer: '#FFE089',
+    tertiary: '#73DD6B',
+    tertiaryContainer: '#006511',
+    tertiaryFixed: '#8FFB85',
+    onTertiaryContainer: '#79E370',
     background: '#121212',
     surface: '#1e1e1e',
+    surfaceContainerLow: '#1e1e1e',
+    surfaceContainerHigh: '#2a2a2a',
+    surfaceContainerHighest: '#333333',
+    surfaceContainerLowest: '#121212',
     error: '#ef5350',
     errorLight: '#3d1a1a',
     success: '#66bb6a',
@@ -182,6 +222,7 @@ export const darkTheme: Theme = {
 export const highContrastTheme: Theme = {
   ...defaultTheme,
   colors: {
+    ...defaultTheme.colors,
     primary: '#000066',
     primaryDark: '#000033',
     primaryLight: '#0000cc',

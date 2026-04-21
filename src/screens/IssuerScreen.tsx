@@ -52,10 +52,10 @@ const IssuerScreen: React.FC = () => {
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{flex: 1}}>
     <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
       <View style={styles.content}>
-        <Text style={styles.title}>Módulo Emissor</Text>
-        <Text style={styles.subtitle}>
-          Simula a emissão de credenciais pela UFSC
-        </Text>
+        <View style={styles.headerSection}>
+          <Text style={styles.headerLabel}>Universidade Federal de Santa Catarina</Text>
+          <Text style={styles.title}>Nova Credencial{'\n'}Acadêmica</Text>
+        </View>
 
         {generalError && <ErrorMessage message={generalError} />}
         {successMessage && <SuccessMessage message={successMessage} />}
@@ -422,64 +422,77 @@ const createStyles = (theme: Theme) =>
       backgroundColor: theme.colors.background,
     },
     content: {
-      padding: theme.spacing.lg,
+      padding: theme.spacing.md,
+      paddingBottom: theme.spacing.xl + 16,
+    },
+    headerSection: {
+      paddingTop: theme.spacing.md,
+      paddingBottom: theme.spacing.lg,
+    },
+    headerLabel: {
+      fontSize: scaleFontSize(theme.typography.fontSizeSmall),
+      fontWeight: 'bold',
+      color: theme.colors.primary,
+      textTransform: 'uppercase',
+      letterSpacing: 1.2,
+      marginBottom: theme.spacing.xs,
     },
     title: {
-      fontSize: scaleFontSize(theme.typography.fontSizeTitle),
-      fontWeight: 'bold',
-      color: theme.colors.primary,
-      marginBottom: theme.spacing.sm,
-    },
-    subtitle: {
-      fontSize: scaleFontSize(theme.typography.fontSizeBase),
-      color: theme.colors.textSecondary,
-      marginBottom: theme.spacing.lg,
+      fontSize: scaleFontSize(32),
+      fontWeight: '800',
+      color: theme.colors.primaryDark,
+      letterSpacing: -0.5,
+      lineHeight: 38,
     },
     section: {
-      backgroundColor: theme.colors.surface,
-      borderRadius: theme.borderRadius.medium,
-      padding: theme.spacing.md,
+      backgroundColor: theme.colors.surfaceContainerLow,
+      borderRadius: theme.borderRadius.large,
+      padding: theme.spacing.lg,
       marginBottom: theme.spacing.md,
-      ...(theme.shadows.small as any),
     },
     sectionTitle: {
-      fontSize: scaleFontSize(18),
+      fontSize: scaleFontSize(theme.typography.fontSizeXLarge),
       fontWeight: 'bold',
-      color: theme.colors.primary,
+      color: theme.colors.text,
       marginBottom: theme.spacing.md,
     },
     fieldContainer: {
       marginBottom: theme.spacing.md,
     },
     label: {
-      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      fontSize: scaleFontSize(theme.typography.fontSizeSmall),
       fontWeight: '600',
-      color: theme.colors.text,
-      marginBottom: theme.spacing.sm,
+      color: theme.colors.textSecondary,
+      marginBottom: theme.spacing.xs,
+      marginLeft: 4,
     },
     input: {
+      height: 44,
       borderWidth: 1,
-      borderColor: theme.colors.border,
+      borderColor: 'rgba(195,198,213,0.2)',
       borderRadius: theme.borderRadius.small,
-      padding: theme.spacing.sm + theme.spacing.xs,
-      fontSize: scaleFontSize(theme.typography.fontSizeLarge),
-      backgroundColor: theme.colors.surface,
+      paddingHorizontal: theme.spacing.md,
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      backgroundColor: theme.colors.surfaceContainerHighest,
+      color: theme.colors.text,
     },
     inputError: {
       borderColor: theme.colors.error,
+      borderWidth: 2,
     },
     errorText: {
       fontSize: scaleFontSize(theme.typography.fontSizeSmall),
       color: theme.colors.error,
       marginTop: theme.spacing.xs,
+      marginLeft: 4,
     },
     statusContainer: {
       flexDirection: 'row',
-      gap: theme.spacing.sm + theme.spacing.xs,
+      gap: theme.spacing.sm,
     },
     statusButton: {
       flex: 1,
-      padding: theme.spacing.sm + theme.spacing.xs,
+      paddingVertical: theme.spacing.sm + 2,
       borderWidth: 1,
       borderColor: theme.colors.border,
       borderRadius: theme.borderRadius.small,
@@ -490,23 +503,25 @@ const createStyles = (theme: Theme) =>
       borderColor: theme.colors.primary,
     },
     statusButtonText: {
-      fontSize: scaleFontSize(theme.typography.fontSizeLarge),
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
       color: theme.colors.textSecondary,
+      fontWeight: '600',
     },
     statusButtonTextActive: {
-      color: theme.colors.surface,
+      color: theme.colors.onPrimary,
       fontWeight: 'bold',
     },
     switchContainer: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      paddingVertical: theme.spacing.sm + theme.spacing.xs,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.divider,
+      paddingVertical: theme.spacing.sm + 4,
+      paddingHorizontal: theme.spacing.sm,
+      borderRadius: theme.borderRadius.small,
     },
     switchLabel: {
-      fontSize: scaleFontSize(theme.typography.fontSizeLarge),
+      fontSize: scaleFontSize(theme.typography.fontSizeBase),
+      fontWeight: '600',
       color: theme.colors.text,
     },
     buttonContainer: {
@@ -515,32 +530,40 @@ const createStyles = (theme: Theme) =>
     },
     issueButton: {
       backgroundColor: theme.colors.primary,
-      padding: theme.spacing.md,
-      borderRadius: theme.borderRadius.medium,
+      minHeight: 56,
+      borderRadius: theme.borderRadius.large,
       alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: 'row',
+      gap: theme.spacing.sm,
+      ...theme.shadows.medium as object,
     },
     issueButtonText: {
-      color: theme.colors.surface,
+      color: theme.colors.onPrimary,
       fontSize: scaleFontSize(18),
       fontWeight: 'bold',
     },
     credentialToken: {
       fontSize: scaleFontSize(theme.typography.fontSizeSmall),
       fontFamily: 'monospace',
-      color: theme.colors.text,
-      backgroundColor: theme.colors.background,
-      padding: theme.spacing.sm + theme.spacing.xs,
+      color: theme.colors.textSecondary,
+      backgroundColor: theme.colors.surfaceContainerHighest,
+      padding: theme.spacing.md,
       borderRadius: theme.borderRadius.small,
-      marginBottom: theme.spacing.sm + theme.spacing.xs,
+      marginBottom: theme.spacing.sm,
     },
     copyButton: {
-      backgroundColor: theme.colors.success,
-      padding: theme.spacing.sm + theme.spacing.xs,
-      borderRadius: theme.borderRadius.medium,
+      backgroundColor: theme.colors.secondaryContainer,
+      paddingVertical: theme.spacing.sm + 2,
+      paddingHorizontal: theme.spacing.md,
+      borderRadius: theme.borderRadius.small,
       alignItems: 'center',
+      flexDirection: 'row',
+      justifyContent: 'center',
+      gap: 6,
     },
     copyButtonText: {
-      color: theme.colors.surface,
+      color: theme.colors.onSecondaryContainer,
       fontSize: scaleFontSize(theme.typography.fontSizeBase),
       fontWeight: '600',
     },

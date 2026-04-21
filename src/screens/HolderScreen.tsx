@@ -58,10 +58,12 @@ const HolderScreen: React.FC = () => {
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{flex: 1}}>
     <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
       <View style={styles.content}>
-        <Text style={styles.title}>Módulo Titular</Text>
-        <Text style={styles.subtitle}>
-          Armazene e visualize suas credenciais acadêmicas
-        </Text>
+        <View style={styles.headerSection}>
+          <Text style={styles.title}>Minha Carteira Acadêmica</Text>
+          <Text style={styles.subtitle}>
+            Gerencie suas credenciais acadêmicas e profissionais emitidas por instituições confiáveis.
+          </Text>
+        </View>
 
         {/* Credential Input Section */}
         <View style={styles.inputSection}>
@@ -236,69 +238,76 @@ const createStyles = (theme: Theme) =>
       backgroundColor: theme.colors.background,
     },
     content: {
-      padding: theme.spacing.lg,
+      padding: theme.spacing.md,
+      paddingBottom: theme.spacing.xl + 16,
+    },
+    headerSection: {
+      paddingTop: theme.spacing.md,
+      paddingBottom: theme.spacing.lg,
     },
     title: {
-      fontSize: scaleFontSize(theme.typography.fontSizeTitle + 4),
+      fontSize: scaleFontSize(32),
       fontWeight: 'bold',
-      color: theme.colors.primary,
-      marginBottom: theme.spacing.sm,
+      color: theme.colors.primaryDark,
+      letterSpacing: -0.5,
     },
     subtitle: {
       fontSize: scaleFontSize(theme.typography.fontSizeLarge),
       color: theme.colors.textSecondary,
-      marginBottom: theme.spacing.lg,
+      marginTop: theme.spacing.xs,
+      lineHeight: 22,
     },
     inputSection: {
-      backgroundColor: theme.colors.surface,
-      borderRadius: theme.borderRadius.medium,
-      padding: theme.spacing.md,
+      backgroundColor: theme.colors.surfaceContainerLow,
+      borderRadius: theme.borderRadius.large,
+      padding: theme.spacing.lg,
       marginBottom: theme.spacing.md,
-      ...(theme.shadows.medium as any),
     },
     requestSection: {
       backgroundColor: theme.colors.warningLight,
-      borderRadius: theme.borderRadius.medium,
-      padding: theme.spacing.md,
+      borderRadius: theme.borderRadius.large,
+      padding: theme.spacing.lg,
       marginBottom: theme.spacing.md,
-      borderWidth: 1,
-      borderColor: theme.colors.warning,
-      ...(theme.shadows.medium as any),
+      borderLeftWidth: 4,
+      borderLeftColor: theme.colors.warning,
     },
     sectionTitle: {
-      fontSize: scaleFontSize(18),
+      fontSize: scaleFontSize(theme.typography.fontSizeXLarge),
       fontWeight: 'bold',
-      color: theme.colors.primary,
-      marginBottom: theme.spacing.sm + theme.spacing.xs,
+      color: theme.colors.text,
+      marginBottom: theme.spacing.sm,
     },
     sectionSubtitle: {
       fontSize: scaleFontSize(theme.typography.fontSizeBase),
       color: theme.colors.textSecondary,
-      marginBottom: theme.spacing.sm + theme.spacing.xs,
+      marginBottom: theme.spacing.sm,
     },
     input: {
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-      borderRadius: theme.borderRadius.medium,
-      padding: theme.spacing.sm + theme.spacing.xs,
+      borderWidth: 0,
+      borderRadius: theme.borderRadius.small,
+      padding: theme.spacing.md,
       fontSize: scaleFontSize(theme.typography.fontSizeBase),
       color: theme.colors.text,
-      backgroundColor: theme.colors.background,
+      backgroundColor: theme.colors.surfaceContainerLowest,
       minHeight: 100,
       textAlignVertical: 'top',
-      marginBottom: theme.spacing.sm + theme.spacing.xs,
+      marginBottom: theme.spacing.sm,
     },
     button: {
       backgroundColor: theme.colors.primary,
-      borderRadius: theme.borderRadius.medium,
-      padding: theme.spacing.md,
+      borderRadius: theme.borderRadius.small,
+      paddingVertical: theme.spacing.sm + 4,
+      paddingHorizontal: theme.spacing.lg,
       alignItems: 'center',
+      flexDirection: 'row',
+      justifyContent: 'center',
+      gap: 8,
     },
     buttonDisabled: {
       backgroundColor: theme.colors.textDisabled,
     },
     buttonText: {
-      color: theme.colors.surface,
+      color: theme.colors.onPrimary,
       fontSize: scaleFontSize(theme.typography.fontSizeLarge),
       fontWeight: 'bold',
     },
@@ -309,7 +318,7 @@ const createStyles = (theme: Theme) =>
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: theme.spacing.sm + theme.spacing.xs,
+      marginBottom: theme.spacing.sm,
     },
     credentialCounter: {
       fontSize: scaleFontSize(theme.typography.fontSizeBase),
@@ -321,13 +330,14 @@ const createStyles = (theme: Theme) =>
     },
     deleteButton: {
       backgroundColor: theme.colors.error,
-      borderRadius: theme.borderRadius.medium,
-      padding: theme.spacing.sm + theme.spacing.xs,
+      borderRadius: theme.borderRadius.small,
+      paddingVertical: theme.spacing.sm,
+      paddingHorizontal: theme.spacing.md,
       alignItems: 'center',
       marginTop: theme.spacing.sm,
     },
     deleteButtonText: {
-      color: theme.colors.surface,
+      color: '#FFFFFF',
       fontSize: scaleFontSize(theme.typography.fontSizeBase),
       fontWeight: '600',
     },
@@ -335,7 +345,7 @@ const createStyles = (theme: Theme) =>
       alignItems: 'center',
       justifyContent: 'center',
       padding: theme.spacing.xl + theme.spacing.sm,
-      marginTop: theme.spacing.xl + theme.spacing.sm,
+      marginTop: theme.spacing.xl,
     },
     emptyStateIcon: {
       fontSize: scaleFontSize(64),
@@ -353,35 +363,41 @@ const createStyles = (theme: Theme) =>
       textAlign: 'center',
     },
     presentationOutputSection: {
-      backgroundColor: theme.colors.surface,
-      borderRadius: theme.borderRadius.medium,
-      padding: theme.spacing.md,
+      backgroundColor: theme.colors.surfaceContainerLowest,
+      borderRadius: theme.borderRadius.large,
+      padding: theme.spacing.lg,
       marginBottom: theme.spacing.md,
-      ...(theme.shadows.medium as any),
+      ...theme.shadows.small as object,
+      borderWidth: 1,
+      borderColor: 'rgba(195,198,213,0.2)',
     },
     qrContainer: {
       alignItems: 'center',
       padding: theme.spacing.lg,
       backgroundColor: theme.colors.surface,
       borderRadius: theme.borderRadius.medium,
-      marginBottom: theme.spacing.sm + theme.spacing.xs,
+      marginBottom: theme.spacing.sm,
       borderWidth: 1,
       borderColor: theme.colors.divider,
     },
     qrHint: {
       fontSize: scaleFontSize(theme.typography.fontSizeBase),
       color: theme.colors.textSecondary,
-      marginTop: theme.spacing.sm + theme.spacing.xs,
+      marginTop: theme.spacing.sm,
       textAlign: 'center',
     },
     copyOutputButton: {
-      backgroundColor: theme.colors.secondary,
-      borderRadius: theme.borderRadius.medium,
-      padding: theme.spacing.sm + theme.spacing.xs,
+      backgroundColor: theme.colors.secondaryContainer,
+      borderRadius: theme.borderRadius.small,
+      paddingVertical: theme.spacing.sm,
+      paddingHorizontal: theme.spacing.md,
       alignItems: 'center',
+      flexDirection: 'row',
+      justifyContent: 'center',
+      gap: 6,
     },
     copyOutputButtonText: {
-      color: theme.colors.surface,
+      color: theme.colors.onSecondaryContainer,
       fontSize: scaleFontSize(theme.typography.fontSizeBase),
       fontWeight: '600',
     },
