@@ -33,7 +33,7 @@
     "expo-clipboard": "~7.0.1",
     "expo-constants": "~17.0.8",
     "expo-dev-client": "~5.0.20",
-    "expo-haptics": "^55.0.14",
+    "expo-haptics": "~14.0.1",
     "expo-linking": "~7.0.5",
     "expo-router": "~4.0.22",
     "expo-status-bar": "~2.0.1",
