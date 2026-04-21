@@ -30,7 +30,8 @@
       "expo-router",
       "./plugins/withZkeyAssetPackaging",
       "./plugins/withDataExtractionRules",
-      "expo-asset"
+      "expo-asset",
+      "expo-font"
     ]
   }
 }
