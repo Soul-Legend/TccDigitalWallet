@@ -388,6 +388,8 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     fontSize: scaleFontSize(11),
     color: '#888888',
     textAlign: 'center',
-    marginTop: 8
+    marginTop: 8,
+  },
+});
 
 export default LogEntry;
