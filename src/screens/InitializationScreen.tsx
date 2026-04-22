@@ -340,6 +340,7 @@ const InitializationScreen: React.FC = () => {
         />
         <Text style={styles.title}>SSI Universitário</Text>
       </Animated.View>
+      {/* eslint-disable-next-line react-native/no-inline-styles */}
       <Animated.View style={{flex: 1, opacity: fadeAnim}}>
         {renderContent()}
       </Animated.View>

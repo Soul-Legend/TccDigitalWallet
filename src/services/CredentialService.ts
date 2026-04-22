@@ -18,7 +18,6 @@ import {
   base64UrlToBytes,
   bytesToBase64Url,
   stringToBase64Url,
-  utf8ToBytes,
 } from './encoding';
 
 function toUint8Array(value: unknown): Uint8Array {

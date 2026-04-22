@@ -579,6 +579,7 @@ class ZKProofService {
     // field modulus (~254 bits) and safe to feed as a single field element.
     let n = 0n;
     for (let i = 0; i < 31; i++) {
+      // eslint-disable-next-line no-bitwise
       n = (n << 8n) | BigInt(digest[i]);
     }
     return n.toString();

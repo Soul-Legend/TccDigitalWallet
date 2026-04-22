@@ -37,13 +37,13 @@ const AppButton: React.FC<AppButtonProps> = ({
   const theme = getTheme();
 
   const handlePress = () => {
-    if (disabled || loading) return;
+    if (disabled || loading) { return; }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onPress();
   };
 
   const getBackgroundColor = () => {
-    if (disabled) return theme.colors.textDisabled;
+    if (disabled) { return theme.colors.textDisabled; }
     switch (variant) {
       case 'primary':
         return theme.colors.primary;
@@ -57,9 +57,9 @@ const AppButton: React.FC<AppButtonProps> = ({
   };
 
   const getTextColor = () => {
-    if (disabled && variant === 'outline') return theme.colors.textDisabled;
-    if (variant === 'outline') return theme.colors.primary;
-    if (disabled) return '#ffffff';
+    if (disabled && variant === 'outline') { return theme.colors.textDisabled; }
+    if (variant === 'outline') { return theme.colors.primary; }
+    if (disabled) { return '#ffffff'; }
     return '#ffffff';
   };
 

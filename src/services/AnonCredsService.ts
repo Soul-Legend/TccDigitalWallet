@@ -401,6 +401,7 @@ class AnonCredsService {
     // Convert to BigInt then to decimal string. AnonCreds expects digits only.
     let value = 0n;
     for (const b of bytes) {
+      // eslint-disable-next-line no-bitwise
       value = (value << 8n) | BigInt(b);
     }
     return value.toString(10);

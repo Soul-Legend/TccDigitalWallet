@@ -16,6 +16,16 @@ import {getTheme, scaleFontSize} from '../utils/theme';
 import type {Theme} from '../utils/theme';
 import {useVerifierState} from './hooks/useVerifierState';
 
+const getScenarioIcon = (id: string): string => {
+  const icons: Record<string, string> = {
+    ru: 'food-apple',
+    elections: 'vote',
+    lab_access: 'flask',
+    age_verification: 'account-clock',
+  };
+  return icons[id] || 'help-circle';
+};
+
 const VerifierScreen: React.FC = () => {
   const theme = getTheme();
   const styles = createStyles(theme);
@@ -42,7 +52,7 @@ const VerifierScreen: React.FC = () => {
   } = useVerifierState();
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{flex: 1}}>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex1}>
     <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
       <View style={styles.content}>
         <Text style={styles.title}>Verificador de Credenciais</Text>
@@ -67,7 +77,12 @@ const VerifierScreen: React.FC = () => {
                 style={styles.scenarioCard}
                 onPress={() => handleSelectScenario(scenario)}
                 accessibilityLabel={`Selecionar cenário ${scenario.name}`}>
-                <Text style={styles.scenarioName}>{scenario.name}</Text>
+                <View style={styles.scenarioIconRow}>
+                  <View style={styles.scenarioIconCircle}>
+                    <MaterialCommunityIcons name={getScenarioIcon(scenario.id) as any} size={24} color="#1351B4" />
+                  </View>
+                  <Text style={styles.scenarioName}>{scenario.name}</Text>
+                </View>
                 <Text style={styles.scenarioDescription}>
                   {scenario.description}
                 </Text>
@@ -170,7 +185,7 @@ const VerifierScreen: React.FC = () => {
                     style={styles.copyButton}
                     onPress={handleCopyRequest}
                     accessibilityLabel="Copiar requisição para área de transferência">
-                    <View style={{flexDirection: 'row', alignItems: 'center', gap: 4}}>
+                    <View style={styles.buttonContent}>
                       <MaterialCommunityIcons name="clipboard-text" size={16} color={theme.colors.surface} />
                       <Text style={styles.copyButtonText}>Copiar para Área de Transferência</Text>
                     </View>
@@ -223,17 +238,21 @@ const VerifierScreen: React.FC = () => {
                     ? styles.validationSuccess
                     : styles.validationFailure,
                 ]}>
-                <MaterialCommunityIcons
-                  name={validationResult.valid ? 'check-circle' : 'close-circle'}
-                  size={48}
-                  color={validationResult.valid ? theme.colors.success : theme.colors.error}
-                  style={styles.validationIcon}
-                />
+                <View style={[styles.validationIconCircle, {backgroundColor: validationResult.valid ? 'rgba(22,136,33,0.2)' : 'rgba(229,34,7,0.2)'}]}>
+                  <MaterialCommunityIcons
+                    name={validationResult.valid ? 'check-bold' : 'close-thick'}
+                    size={40}
+                    color={validationResult.valid ? '#168821' : '#E52207'}
+                  />
+                </View>
                 <Text style={styles.validationTitle}>
                   {validationResult.valid
                     ? 'Apresentação Válida'
                     : 'Apresentação Inválida'}
                 </Text>
+                {validationResult.valid && (
+                  <Text style={styles.validationMetadata}>Assinaturas verificadas com sucesso</Text>
+                )}
 
                 {/* Trust Chain Status */}
                 {validationResult.trust_chain_valid !== undefined && (
@@ -330,6 +349,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     fontWeight: 'bold',
     color: '#333333',
     marginBottom: 8,
+    flex: 1,
   },
   scenarioDescription: {
     fontSize: scaleFontSize(14),
@@ -484,6 +504,34 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     fontSize: scaleFontSize(48),
     marginBottom: 8,
   },
+  validationIconCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    alignSelf: 'center' as const,
+    marginBottom: 16,
+  },
+  validationMetadata: {
+    fontSize: scaleFontSize(14),
+    color: '#168821',
+    marginBottom: 8,
+  },
+  scenarioIconRow: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    marginBottom: 4,
+  },
+  scenarioIconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(19,81,180,0.1)',
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    marginRight: 12,
+  },
   validationTitle: {
     fontSize: scaleFontSize(20),
     fontWeight: 'bold',
@@ -535,6 +583,14 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     color: '#888888',
     marginTop: 8,
     textAlign: 'center',
+  },
+  flex1: {
+    flex: 1,
+  },
+  buttonContent: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: 4,
   },
 });
 

@@ -206,7 +206,7 @@ export class PEXValidator {
       return null;
     }
     const segments = paths[0]
-      .split(/[.\[\]'"]/)
+      .split(/[.[\]'"]/)
       .filter(s => s && s !== '$' && s !== 'credentialSubject');
     return segments.length > 0 ? segments[segments.length - 1] : null;
   }

@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise */
 /**
  * Encoding & canonicalization helpers shared by services.
  *

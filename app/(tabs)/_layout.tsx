@@ -1,7 +1,6 @@
 import React from 'react';
 import {Tabs} from 'expo-router';
-import {MaterialCommunityIcons} from '@expo/vector-icons';
-import {MaterialIcons} from '@expo/vector-icons';
+import {MaterialIcons, MaterialCommunityIcons} from '@expo/vector-icons';
 import {getTheme} from '../../src/utils/theme';
 
 export default function TabsLayout(): React.JSX.Element {
@@ -39,6 +38,15 @@ export default function TabsLayout(): React.JSX.Element {
         options={{
           title: 'Carteira',
           headerTitle: 'Identidade Universitária',
+          // eslint-disable-next-line react/no-unstable-nested-components
+          headerLeft: () => (
+            <MaterialIcons name="account-circle" size={32} color="#FFFFFF" style={{marginLeft: 16}} />
+          ),
+          // eslint-disable-next-line react/no-unstable-nested-components
+          headerRight: () => (
+            <MaterialIcons name="settings" size={24} color="#FFFFFF" style={{marginRight: 16}} />
+          ),
+          // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({color, size}) => (
             <MaterialIcons name="account-balance-wallet" size={size} color={color} />
           ),
@@ -49,8 +57,9 @@ export default function TabsLayout(): React.JSX.Element {
         options={{
           title: 'Emitir',
           headerTitle: 'Nova Credencial Acadêmica',
+          // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({color, size}) => (
-            <MaterialIcons name="note-add" size={size} color={color} />
+            <MaterialCommunityIcons name="file-document-edit" size={size} color={color} />
           ),
         }}
       />
@@ -59,6 +68,7 @@ export default function TabsLayout(): React.JSX.Element {
         options={{
           title: 'Carteira',
           headerTitle: 'Minha Carteira Acadêmica',
+          // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({color, size}) => (
             <MaterialIcons name="account-balance-wallet" size={size} color={color} />
           ),
@@ -70,6 +80,7 @@ export default function TabsLayout(): React.JSX.Element {
         options={{
           title: 'Validar',
           headerTitle: 'Verificador de Credenciais',
+          // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({color, size}) => (
             <MaterialIcons name="verified-user" size={size} color={color} />
           ),
@@ -80,6 +91,7 @@ export default function TabsLayout(): React.JSX.Element {
         options={{
           title: 'Eventos',
           headerTitle: 'Eventos',
+          // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({color, size}) => (
             <MaterialIcons name="history" size={size} color={color} />
           ),
@@ -90,6 +102,7 @@ export default function TabsLayout(): React.JSX.Element {
         options={{
           title: 'Glossário',
           headerTitle: 'Glossário SSI',
+          // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({color, size}) => (
             <MaterialIcons name="menu-book" size={size} color={color} />
           ),

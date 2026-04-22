@@ -55,7 +55,7 @@ const HolderScreen: React.FC = () => {
   } = useHolderState();
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{flex: 1}}>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex1}>
     <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
       <View style={styles.content}>
         <View style={styles.headerSection}>
@@ -159,7 +159,7 @@ const HolderScreen: React.FC = () => {
                   style={styles.copyOutputButton}
                   onPress={handleCopyOutput}
                   accessibilityLabel="Copiar apresentação">
-                  <View style={{flexDirection: 'row', alignItems: 'center', gap: 4}}>
+                  <View style={styles.buttonContent}>
                     <MaterialCommunityIcons name="clipboard-text" size={16} color={theme.colors.surface} />
                     <Text style={styles.copyOutputButtonText}>Copiar Apresentação</Text>
                   </View>
@@ -204,13 +204,14 @@ const HolderScreen: React.FC = () => {
                     style={styles.deleteButton}
                     onPress={() => handleDeleteCredential(index)}
                     accessibilityLabel={`Excluir credencial ${index + 1}`}>
-                    <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4}}>
+                    <View style={styles.deleteButtonContent}>
                       <MaterialCommunityIcons name="delete" size={16} color={theme.colors.surface} />
                       <Text style={styles.deleteButtonText}>Excluir Credencial</Text>
                     </View>
                   </TouchableOpacity>
                 </View>
               )}
+              // eslint-disable-next-line react/no-unstable-nested-components
               ItemSeparatorComponent={() => <View style={{height: theme.spacing.md}} />}
             />
           </View>
@@ -399,6 +400,20 @@ const createStyles = (theme: Theme) =>
       color: '#071D41',
       fontSize: scaleFontSize(14),
       fontWeight: '600',
+    },
+    flex1: {
+      flex: 1,
+    },
+    buttonContent: {
+      flexDirection: 'row' as const,
+      alignItems: 'center' as const,
+      gap: 4,
+    },
+    deleteButtonContent: {
+      flexDirection: 'row' as const,
+      alignItems: 'center' as const,
+      justifyContent: 'center' as const,
+      gap: 4,
     },
   });
 

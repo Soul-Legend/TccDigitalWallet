@@ -107,7 +107,7 @@ for (const pkg of PACKAGES) {
   const gradlePath = path.join(
     __dirname, '..', 'node_modules', pkg, 'android', 'build.gradle'
   );
-  if (!fs.existsSync(gradlePath)) continue;
+  if (!fs.existsSync(gradlePath)) { continue; }
   let gradle = fs.readFileSync(gradlePath, 'utf8');
   if (gradle.includes('-std=c++1y')) {
     gradle = gradle.replace(/-std=c\+\+1y/g, '-std=c++17');

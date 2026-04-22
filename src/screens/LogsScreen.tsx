@@ -126,9 +126,9 @@ const LogsScreen: React.FC = () => {
       lines.push(`  Error: ${log.error.message}`);
     }
     if (log.details) {
-      if (log.details.algorithm) lines.push(`  Algorithm: ${log.details.algorithm}`);
-      if (log.details.did_method) lines.push(`  DID Method: ${log.details.did_method}`);
-      if (log.details.format) lines.push(`  Format: ${log.details.format}`);
+      if (log.details.algorithm) { lines.push(`  Algorithm: ${log.details.algorithm}`); }
+      if (log.details.did_method) { lines.push(`  DID Method: ${log.details.did_method}`); }
+      if (log.details.format) { lines.push(`  Format: ${log.details.format}`); }
       if (log.details.parameters) {
         for (const [k, v] of Object.entries(log.details.parameters)) {
           const val = typeof v === 'object' ? JSON.stringify(v) : String(v);

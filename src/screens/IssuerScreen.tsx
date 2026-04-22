@@ -49,7 +49,7 @@ const IssuerScreen: React.FC = () => {
   } = useIssuerState();
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{flex: 1}}>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex1}>
     <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
       <View style={styles.content}>
         <View style={styles.headerSection}>
@@ -561,6 +561,9 @@ const createStyles = (theme: Theme) =>
       color: '#071D41',
       fontSize: scaleFontSize(14),
       fontWeight: '600',
+    },
+    flex1: {
+      flex: 1,
     },
   });
 

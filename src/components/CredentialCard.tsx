@@ -1,5 +1,6 @@
 import React from 'react';
 import {View, Text, StyleSheet, ScrollView} from 'react-native';
+import {MaterialIcons} from '@expo/vector-icons';
 import {VerifiableCredential} from '../types';
 import {getTheme, scaleFontSize, Theme} from '../utils/theme';
 
@@ -32,7 +33,13 @@ const CredentialCard: React.FC<CredentialCardProps> = ({credential}) => {
   return (
     <View style={styles.card}>
       <View style={styles.header}>
-        <Text style={styles.title}>Carteira de Identidade Acadêmica</Text>
+        <View style={styles.headerRow}>
+          <MaterialIcons name="school" size={24} color={theme.colors.primary} style={{marginRight: 8}} />
+          <Text style={styles.title}>Carteira de Identidade Acadêmica</Text>
+        </View>
+        <View style={styles.verifiedBadge}>
+          <Text style={styles.verifiedBadgeText}>VERIFICADA</Text>
+        </View>
         <Text style={styles.issuer}>Emitido por: {credential.issuer}</Text>
         <Text style={styles.date}>
           Data de emissão: {formatDate(credential.issuanceDate)}
@@ -190,11 +197,29 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     paddingBottom: 12,
     marginBottom: theme.spacing.md,
   },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: theme.spacing.sm,
+  },
+  verifiedBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(22,136,33,0.15)',
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    marginBottom: theme.spacing.sm,
+  },
+  verifiedBadgeText: {
+    fontSize: scaleFontSize(11),
+    fontWeight: '700',
+    color: '#168821',
+  },
   title: {
     fontSize: scaleFontSize(20),
     fontWeight: 'bold',
     color: theme.colors.primary,
-    marginBottom: theme.spacing.sm,
+    flex: 1,
   },
   issuer: {
     fontSize: scaleFontSize(12),

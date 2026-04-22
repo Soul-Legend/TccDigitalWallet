@@ -43,12 +43,12 @@ const TrustChainSection: React.FC<TrustChainSectionProps> = ({
         onPress={onToggleExpanded}
         accessibilityLabel={`Cadeia de Confian\u00e7a, ${expanded ? 'expandido' : 'recolhido'}. ${trustedIssuers.length} emissores`}
         accessibilityRole="button">
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        <View style={styles.trustChainRow}>
           <MaterialCommunityIcons name="link-variant" size={18} color={theme.colors.primary} />
-          <Text style={[styles.sectionTitle, {marginLeft: 6, marginBottom: 0}]}>
+          <Text style={[styles.sectionTitle, styles.trustChainTitle]}>
             Cadeia de Confiança
           </Text>
-          <MaterialCommunityIcons name={expanded ? 'chevron-down' : 'chevron-right'} size={18} color={theme.colors.primary} style={{marginLeft: 4}} />
+          <MaterialCommunityIcons name={expanded ? 'chevron-down' : 'chevron-right'} size={18} color={theme.colors.primary} style={styles.trustChainIcon} />
         </View>
         <Text style={styles.chainBadge}>
           {trustedIssuers.length} emissor(es)
@@ -158,7 +158,7 @@ const TrustChainSection: React.FC<TrustChainSectionProps> = ({
                 )}
 
                 <TextInput
-                  style={[styles.input, {marginTop: 12}]}
+                  style={[styles.input, styles.sectionMarginLg]}
                   value={childDid}
                   onChangeText={onChildDidChange}
                   placeholder="DID do emissor (ex: did:web:dept.ufsc.br)"
@@ -166,7 +166,7 @@ const TrustChainSection: React.FC<TrustChainSectionProps> = ({
                   accessibilityLabel="DID do emissor filho"
                 />
                 <TextInput
-                  style={[styles.input, {marginTop: 8}]}
+                  style={[styles.input, styles.sectionMarginMd]}
                   value={childName}
                   onChangeText={onChildNameChange}
                   placeholder="Nome do emissor (ex: CAGR)"
@@ -174,7 +174,7 @@ const TrustChainSection: React.FC<TrustChainSectionProps> = ({
                   accessibilityLabel="Nome do emissor filho"
                 />
                 <TouchableOpacity
-                  style={[styles.chainButton, {marginTop: 12}]}
+                  style={[styles.chainButton, styles.sectionMarginLg]}
                   onPress={onRegisterChild}
                   disabled={isChainLoading || !childDid.trim() || !childName.trim()}
                   accessibilityLabel="Registrar emissor filho"
@@ -345,6 +345,23 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     padding: 12,
     fontSize: scaleFontSize(16),
     backgroundColor: theme.colors.surface,
+  },
+  trustChainRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  trustChainTitle: {
+    marginLeft: 6,
+    marginBottom: 0,
+  },
+  trustChainIcon: {
+    marginLeft: 4,
+  },
+  sectionMarginLg: {
+    marginTop: 12,
+  },
+  sectionMarginMd: {
+    marginTop: 8,
   },
 });
 
