@@ -204,7 +204,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   verifiedBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(22,136,33,0.15)',
+    backgroundColor: 'rgba(0,74,9,0.1)',
     borderRadius: 12,
     paddingHorizontal: 10,
     paddingVertical: 3,
@@ -213,7 +213,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   verifiedBadgeText: {
     fontSize: scaleFontSize(11),
     fontWeight: '700',
-    color: '#168821',
+    color: theme.colors.tertiary,
   },
   title: {
     fontSize: scaleFontSize(20),

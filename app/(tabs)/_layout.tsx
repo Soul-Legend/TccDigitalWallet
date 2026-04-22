@@ -9,34 +9,40 @@ export default function TabsLayout(): React.JSX.Element {
   return (
     <Tabs
       screenOptions={{
-        headerStyle: {backgroundColor: theme.colors.primary},
+        headerStyle: {
+          backgroundColor: theme.colors.primaryContainer,
+          elevation: 0,
+          shadowOpacity: 0,
+        },
         headerTintColor: theme.colors.onPrimary,
-        headerTitleStyle: {fontWeight: 'bold', fontSize: 18},
+        headerTitleStyle: {fontWeight: '700', fontSize: 18, letterSpacing: -0.3},
         tabBarStyle: {
-          backgroundColor: '#FFFFFF',
+          backgroundColor: theme.colors.background,
           borderTopColor: theme.colors.divider,
-          borderTopWidth: 1,
+          borderTopWidth: 0,
           paddingBottom: 8,
           paddingTop: 6,
           height: 72,
-          elevation: 8,
-          shadowColor: '#000',
-          shadowOffset: {width: 0, height: -2},
+          elevation: 0,
+          shadowColor: '#1B1B1C',
+          shadowOffset: {width: 0, height: -4},
           shadowOpacity: 0.05,
-          shadowRadius: 8,
+          shadowRadius: 20,
         },
-        tabBarActiveTintColor: '#1351B4',
-        tabBarInactiveTintColor: '#888888',
+        tabBarActiveTintColor: theme.colors.primaryContainer,
+        tabBarInactiveTintColor: theme.colors.textDisabled,
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: 10,
           fontWeight: '600',
+          textTransform: 'uppercase',
+          letterSpacing: 0.8,
         },
         animation: 'shift',
       }}>
       <Tabs.Screen
         name="home"
         options={{
-          title: 'Carteira',
+          title: 'Vault',
           headerTitle: 'Identidade Universitária',
           // eslint-disable-next-line react/no-unstable-nested-components
           headerLeft: () => (
@@ -55,18 +61,18 @@ export default function TabsLayout(): React.JSX.Element {
       <Tabs.Screen
         name="emissor"
         options={{
-          title: 'Emitir',
+          title: 'Issue',
           headerTitle: 'Nova Credencial Acadêmica',
           // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({color, size}) => (
-            <MaterialCommunityIcons name="file-document-edit" size={size} color={color} />
+            <MaterialIcons name="add-moderator" size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="titular"
         options={{
-          title: 'Carteira',
+          title: 'Vault',
           headerTitle: 'Minha Carteira Acadêmica',
           // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({color, size}) => (
@@ -78,7 +84,7 @@ export default function TabsLayout(): React.JSX.Element {
       <Tabs.Screen
         name="verificador"
         options={{
-          title: 'Validar',
+          title: 'Verify',
           headerTitle: 'Verificador de Credenciais',
           // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({color, size}) => (
@@ -89,18 +95,18 @@ export default function TabsLayout(): React.JSX.Element {
       <Tabs.Screen
         name="logs"
         options={{
-          title: 'Eventos',
-          headerTitle: 'Eventos',
+          title: 'Logs',
+          headerTitle: 'Atividades de Segurança',
           // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({color, size}) => (
-            <MaterialIcons name="history" size={size} color={color} />
+            <MaterialCommunityIcons name="history" size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="glossario"
         options={{
-          title: 'Glossário',
+          title: 'Glossary',
           headerTitle: 'Glossário SSI',
           // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({color, size}) => (

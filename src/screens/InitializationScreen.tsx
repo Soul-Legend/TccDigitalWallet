@@ -36,9 +36,9 @@ const createStyles = (theme: Theme) =>
     },
     title: {
       fontSize: scaleFontSize(theme.typography.fontSizeXLarge),
-      fontWeight: 'bold',
+      fontWeight: '700',
       color: theme.colors.primary,
-      letterSpacing: 0.5,
+      letterSpacing: 0.3,
     },
     subtitle: {
       fontSize: scaleFontSize(theme.typography.fontSizeBase),
@@ -48,7 +48,7 @@ const createStyles = (theme: Theme) =>
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      paddingHorizontal: 16,
+      paddingHorizontal: 24,
     },
     loadingText: {
       fontSize: scaleFontSize(theme.typography.fontSizeLarge + 2),
@@ -62,21 +62,23 @@ const createStyles = (theme: Theme) =>
       marginTop: theme.spacing.sm,
     },
     successIconContainer: {
-      width: 80,
-      height: 80,
-      borderRadius: 40,
-      backgroundColor: 'rgba(22, 136, 33, 0.2)',
+      width: 96,
+      height: 96,
+      borderRadius: 48,
+      backgroundColor: theme.colors.tertiaryFixed,
       alignItems: 'center',
       justifyContent: 'center',
       marginBottom: theme.spacing.lg,
+      ...theme.shadows.large as object,
     },
     successTitle: {
       fontSize: scaleFontSize(32),
       fontWeight: '900',
-      color: theme.colors.primary,
+      color: theme.colors.text,
       marginBottom: theme.spacing.md,
       textAlign: 'center',
       lineHeight: 38,
+      letterSpacing: -0.5,
     },
     successSubtitle: {
       fontSize: scaleFontSize(16),
@@ -87,29 +89,35 @@ const createStyles = (theme: Theme) =>
       maxWidth: 320,
     },
     didContainer: {
-      backgroundColor: '#EEEEEE',
-      borderRadius: theme.borderRadius.small,
-      padding: 16,
+      backgroundColor: theme.colors.surfaceContainerLow,
+      borderRadius: 12,
+      padding: 20,
       marginBottom: theme.spacing.xl,
       width: '100%',
       borderLeftWidth: 4,
-      borderLeftColor: '#1351B4',
+      borderLeftColor: theme.colors.primary,
     },
     didLabelRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
       marginBottom: theme.spacing.sm,
     },
     didLabel: {
       fontSize: scaleFontSize(12),
       fontWeight: '600',
-      color: '#071D41',
+      color: theme.colors.text,
       textTransform: 'uppercase',
-      letterSpacing: 0.5,
+      letterSpacing: 0.8,
     },
     didTextContainer: {
+      backgroundColor: theme.colors.surfaceContainerHighest,
+      borderRadius: 8,
+      padding: 12,
     },
     didText: {
       fontSize: scaleFontSize(13),
-      color: '#071D41',
+      color: theme.colors.textSecondary,
       fontFamily: 'monospace',
     },
     infoText: {
@@ -121,7 +129,7 @@ const createStyles = (theme: Theme) =>
       maxWidth: 320,
     },
     continueButton: {
-      backgroundColor: '#071D41',
+      backgroundColor: theme.colors.primary,
       paddingVertical: theme.spacing.md,
       paddingHorizontal: theme.spacing.xl + 8,
       borderRadius: 12,
@@ -131,11 +139,12 @@ const createStyles = (theme: Theme) =>
       justifyContent: 'center',
       gap: 8,
       minHeight: 52,
+      ...theme.shadows.medium as object,
     },
     continueButtonText: {
-      color: '#FFFFFF',
+      color: theme.colors.onPrimary,
       fontSize: scaleFontSize(theme.typography.fontSizeLarge),
-      fontWeight: 'bold',
+      fontWeight: '700',
     },
     errorIconContainer: {
       width: 80,
@@ -148,7 +157,7 @@ const createStyles = (theme: Theme) =>
     },
     errorTitle: {
       fontSize: scaleFontSize(28),
-      fontWeight: 'bold',
+      fontWeight: '700',
       color: theme.colors.error,
       marginBottom: theme.spacing.md,
       textAlign: 'center',
@@ -173,7 +182,7 @@ const createStyles = (theme: Theme) =>
     retryButtonText: {
       color: '#FFFFFF',
       fontSize: scaleFontSize(theme.typography.fontSizeLarge),
-      fontWeight: 'bold',
+      fontWeight: '700',
     },
   });
 
@@ -284,7 +293,7 @@ const InitializationScreen: React.FC = () => {
         return (
           <View style={styles.contentContainer}>
             <View style={styles.successIconContainer}>
-              <MaterialCommunityIcons name="check-bold" size={40} color="#168821" />
+              <MaterialCommunityIcons name="check-bold" size={48} color="#002202" />
             </View>
             <Text style={styles.successTitle}>
               Identidade Acadêmica Criada

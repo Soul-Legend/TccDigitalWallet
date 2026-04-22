@@ -23,59 +23,56 @@ const createStyles = (theme: Theme) =>
     scrollContent: {
       paddingBottom: theme.spacing.xl,
     },
-    welcomeBanner: {
-      backgroundColor: '#2B69D1',
-      borderRadius: 8,
+    heroSection: {
+      backgroundColor: theme.colors.primaryContainer,
+      borderRadius: 12,
       marginHorizontal: 16,
       marginTop: 16,
-      marginBottom: 16,
-      padding: 20,
+      marginBottom: 24,
+      padding: 24,
+      overflow: 'hidden',
+      ...theme.shadows.large as object,
     },
-    welcomeTitle: {
-      fontSize: scaleFontSize(20),
-      fontWeight: '700',
-      color: '#FFFFFF',
-      marginBottom: 4,
+    heroTitle: {
+      fontSize: scaleFontSize(28),
+      fontWeight: '900',
+      color: theme.colors.onPrimary,
+      marginBottom: 8,
+      letterSpacing: -0.5,
     },
-    welcomeSubtitle: {
-      fontSize: scaleFontSize(14),
-      color: '#FFFFFF',
-      opacity: 0.8,
-      lineHeight: 20,
+    heroSubtitle: {
+      fontSize: scaleFontSize(15),
+      color: theme.colors.onPrimaryContainer,
+      lineHeight: 22,
     },
     modulesContainer: {
       paddingHorizontal: 16,
-      gap: 16,
+      gap: 12,
     },
     moduleCard: {
-      backgroundColor: '#FFFFFF',
-      borderRadius: 8,
-      padding: 16,
-      flexDirection: 'row',
-      alignItems: 'center',
+      backgroundColor: theme.colors.surfaceContainerLowest,
+      borderRadius: 12,
+      padding: 20,
       ...theme.shadows.medium as object,
     },
     moduleIconContainer: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
+      width: 48,
+      height: 48,
+      borderRadius: 24,
       alignItems: 'center',
       justifyContent: 'center',
-      marginRight: 16,
-    },
-    moduleTextContainer: {
-      flex: 1,
+      marginBottom: 12,
     },
     moduleName: {
-      fontSize: scaleFontSize(20),
+      fontSize: scaleFontSize(18),
       fontWeight: '700',
-      color: '#333333',
-      marginBottom: 2,
+      color: theme.colors.text,
+      marginBottom: 4,
     },
     moduleDescription: {
-      fontSize: scaleFontSize(14),
-      color: '#888888',
-      lineHeight: 20,
+      fontSize: scaleFontSize(13),
+      color: theme.colors.textSecondary,
+      lineHeight: 18,
     },
   });
 
@@ -91,51 +88,51 @@ const HomeScreen: React.FC = () => {
   const modules = [
     {
       name: 'Minha Carteira',
-      description: 'Credenciais digitais armazenadas com segurança.',
+      description: 'Acesse e gerencie suas credenciais digitais armazenadas com segurança.',
       route: 'Titular' as const,
       path: Routes.Titular,
       icon: 'account-balance-wallet' as const,
-      iconBg: '#D4E5FF',
-      iconColor: '#1351B4',
+      iconBg: '#D9E2FF',
+      iconColor: '#003A8C',
       isMaterial: true,
     },
     {
       name: 'Emitir Credencial',
-      description: 'Emita novas credenciais verificáveis.',
+      description: 'Emita novas credenciais verificáveis para outros estudantes ou entidades.',
       route: 'Emissor' as const,
       path: Routes.Emissor,
-      icon: 'plus-box' as const,
-      iconBg: '#FFF5C2',
-      iconColor: '#FFCD07',
+      icon: 'shield-check' as const,
+      iconBg: '#FFE089',
+      iconColor: '#6E5700',
       isMaterial: false,
     },
     {
       name: 'Validar',
-      description: 'Verifique a autenticidade de credenciais.',
+      description: 'Verifique a autenticidade de credenciais apresentadas a você.',
       route: 'Verificador' as const,
       path: Routes.Verificador,
-      icon: 'shield-check' as const,
-      iconBg: '#E3F5E1',
-      iconColor: '#168821',
-      isMaterial: false,
+      icon: 'verified-user' as const,
+      iconBg: '#8FFB85',
+      iconColor: '#004A09',
+      isMaterial: true,
     },
     {
       name: 'Eventos',
-      description: 'Histórico de atividades e logs.',
+      description: 'Consulte o histórico de atividades e logs de suas credenciais.',
       route: 'Logs' as const,
       path: Routes.Logs,
-      icon: 'clipboard-list' as const,
-      iconBg: '#EEEEEE',
-      iconColor: '#888888',
-      isMaterial: false,
+      icon: 'history-edu' as const,
+      iconBg: '#E5E2E1',
+      iconColor: '#434653',
+      isMaterial: true,
     },
   ];
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
-      <View style={styles.welcomeBanner}>
-        <Text style={styles.welcomeTitle}>Olá, Estudante</Text>
-        <Text style={styles.welcomeSubtitle}>
+      <View style={styles.heroSection}>
+        <Text style={styles.heroTitle}>Olá, Estudante</Text>
+        <Text style={styles.heroSubtitle}>
           Bem-vindo à sua Carteira Digital SSI. Gerencie suas credenciais verificáveis de forma segura e soberana.
         </Text>
       </View>
@@ -157,15 +154,13 @@ const HomeScreen: React.FC = () => {
             accessibilityRole="button">
             <View style={[styles.moduleIconContainer, {backgroundColor: module.iconBg}]} accessible={false}>
               {module.isMaterial ? (
-                <MaterialIcons name={module.icon as any} size={22} color={module.iconColor} />
+                <MaterialIcons name={module.icon as any} size={24} color={module.iconColor} />
               ) : (
-                <MaterialCommunityIcons name={module.icon as any} size={22} color={module.iconColor} />
+                <MaterialCommunityIcons name={module.icon as any} size={24} color={module.iconColor} />
               )}
             </View>
-            <View style={styles.moduleTextContainer}>
-              <Text style={styles.moduleName}>{module.name}</Text>
-              <Text style={styles.moduleDescription}>{module.description}</Text>
-            </View>
+            <Text style={styles.moduleName}>{module.name}</Text>
+            <Text style={styles.moduleDescription}>{module.description}</Text>
           </TouchableOpacity>
         ))}
       </View>

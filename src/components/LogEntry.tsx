@@ -255,16 +255,17 @@ const LogEntry: React.FC<LogEntryProps> = ({log}) => {
 
 const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
+    backgroundColor: theme.colors.surfaceContainerLowest,
+    borderRadius: 12,
     padding: 16,
     marginVertical: 4,
     borderLeftWidth: 3,
-    borderLeftColor: '#168821',
+    borderLeftColor: theme.colors.tertiary,
     overflow: 'hidden',
+    ...theme.shadows.small as object,
   },
   errorContainer: {
-    borderLeftColor: '#E52207',
+    borderLeftColor: theme.colors.error,
   },
   header: {
     flexDirection: 'row',
@@ -285,17 +286,17 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   operationText: {
     fontSize: scaleFontSize(16),
-    fontWeight: 'bold',
-    color: '#333333',
+    fontWeight: '700',
+    color: theme.colors.text,
     marginBottom: 2,
   },
   moduleText: {
     fontSize: scaleFontSize(13),
-    color: '#888888',
+    color: theme.colors.textSecondary,
   },
   timestamp: {
     fontSize: scaleFontSize(12),
-    color: '#888888',
+    color: theme.colors.textSecondary,
     fontWeight: '600',
     marginBottom: 8,
   },
@@ -304,34 +305,32 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     fontWeight: 'bold',
   },
   successBadge: {
-    color: '#168821',
+    color: theme.colors.tertiary,
   },
   errorBadge: {
-    color: '#E52207',
+    color: theme.colors.error,
   },
   errorMessageContainer: {
-    backgroundColor: '#FDE0DB',
+    backgroundColor: theme.colors.errorLight,
     padding: 8,
-    borderRadius: 4,
+    borderRadius: 8,
     marginVertical: 8,
   },
   errorMessage: {
     fontSize: scaleFontSize(13),
-    color: '#E52207',
+    color: theme.colors.error,
     fontWeight: '500',
   },
   detailsContainer: {
     marginTop: 12,
     paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#EEEEEE',
   },
   detailRow: {
     marginBottom: 10,
   },
   detailLabel: {
     fontSize: scaleFontSize(12),
-    color: '#888888',
+    color: theme.colors.textDisabled,
     marginBottom: 4,
     fontWeight: '600',
     textTransform: 'uppercase',
@@ -339,25 +338,25 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   detailValue: {
     fontSize: scaleFontSize(14),
-    color: '#333333',
+    color: theme.colors.text,
   },
   detailValueMono: {
     fontSize: scaleFontSize(13),
-    color: '#888888',
+    color: theme.colors.textSecondary,
     fontFamily: 'monospace',
   },
   successText: {
-    color: '#168821',
+    color: theme.colors.tertiary,
     fontWeight: 'bold',
   },
   errorText: {
-    color: '#E52207',
+    color: theme.colors.error,
     fontWeight: 'bold',
   },
   parametersContainer: {
-    backgroundColor: '#EEEEEE',
+    backgroundColor: theme.colors.surfaceContainerHighest,
     padding: 8,
-    borderRadius: 4,
+    borderRadius: 8,
     marginTop: 4,
   },
   parameterRow: {
@@ -366,27 +365,27 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   parameterKey: {
     fontSize: scaleFontSize(12),
-    color: '#888888',
+    color: theme.colors.textDisabled,
     fontWeight: '600',
     marginRight: 8,
   },
   parameterValue: {
     fontSize: scaleFontSize(12),
-    color: '#333333',
+    color: theme.colors.text,
     flex: 1,
   },
   stackTrace: {
     fontSize: scaleFontSize(11),
-    color: '#888888',
+    color: theme.colors.textSecondary,
     fontFamily: 'monospace',
-    backgroundColor: '#EEEEEE',
+    backgroundColor: theme.colors.surfaceContainerHighest,
     padding: 8,
-    borderRadius: 4,
+    borderRadius: 8,
     marginTop: 4,
   },
   expandHint: {
     fontSize: scaleFontSize(11),
-    color: '#888888',
+    color: theme.colors.textDisabled,
     textAlign: 'center',
     marginTop: 8,
   },

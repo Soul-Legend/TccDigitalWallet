@@ -79,7 +79,7 @@ const VerifierScreen: React.FC = () => {
                 accessibilityLabel={`Selecionar cenário ${scenario.name}`}>
                 <View style={styles.scenarioIconRow}>
                   <View style={styles.scenarioIconCircle}>
-                    <MaterialCommunityIcons name={getScenarioIcon(scenario.id) as any} size={24} color="#1351B4" />
+                    <MaterialCommunityIcons name={getScenarioIcon(scenario.id) as any} size={24} color={theme.colors.primary} />
                   </View>
                   <Text style={styles.scenarioName}>{scenario.name}</Text>
                 </View>
@@ -238,11 +238,11 @@ const VerifierScreen: React.FC = () => {
                     ? styles.validationSuccess
                     : styles.validationFailure,
                 ]}>
-                <View style={[styles.validationIconCircle, {backgroundColor: validationResult.valid ? 'rgba(22,136,33,0.2)' : 'rgba(229,34,7,0.2)'}]}>
+                <View style={[styles.validationIconCircle, {backgroundColor: validationResult.valid ? theme.colors.tertiaryFixed : theme.colors.errorLight}]}>
                   <MaterialCommunityIcons
                     name={validationResult.valid ? 'check-bold' : 'close-thick'}
-                    size={40}
-                    color={validationResult.valid ? '#168821' : '#E52207'}
+                    size={24}
+                    color={validationResult.valid ? theme.colors.tertiary : theme.colors.error}
                   />
                 </View>
                 <Text style={styles.validationTitle}>
@@ -314,13 +314,15 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   title: {
     fontSize: scaleFontSize(32),
     fontWeight: '900',
-    color: '#071D41',
+    color: theme.colors.primary,
     marginBottom: 8,
+    letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: scaleFontSize(14),
-    color: '#888888',
+    color: theme.colors.textSecondary,
     marginBottom: 16,
+    lineHeight: 20,
   },
   scenarioSection: {
     marginBottom: 12,
@@ -328,99 +330,98 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   sectionTitle: {
     fontSize: scaleFontSize(20),
     fontWeight: '700',
-    color: '#071D41',
+    color: theme.colors.text,
     marginBottom: 8,
   },
   sectionSubtitle: {
     fontSize: scaleFontSize(14),
-    color: '#888888',
+    color: theme.colors.textSecondary,
     marginBottom: 8,
   },
   scenarioCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-    padding: 20,
-    marginBottom: 8,
-    borderLeftWidth: 4,
-    borderLeftColor: '#1351B4',
+    backgroundColor: theme.colors.surfaceContainerLowest,
+    borderRadius: 12,
+    padding: 24,
+    marginBottom: 12,
+    ...theme.shadows.small as object,
   },
   scenarioName: {
     fontSize: scaleFontSize(18),
-    fontWeight: 'bold',
-    color: '#333333',
+    fontWeight: '700',
+    color: theme.colors.text,
     marginBottom: 8,
     flex: 1,
   },
   scenarioDescription: {
     fontSize: scaleFontSize(14),
-    color: '#888888',
+    color: theme.colors.textSecondary,
     marginBottom: 8,
     lineHeight: 20,
   },
   scenarioTypeBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#EEEEEE',
+    backgroundColor: theme.colors.surfaceContainerHighest,
     borderRadius: 20,
     paddingHorizontal: 12,
     paddingVertical: 4,
   },
   scenarioTypeText: {
     fontSize: scaleFontSize(12),
-    color: '#888888',
+    color: theme.colors.textSecondary,
     fontWeight: '600',
   },
   selectedScenarioHeader: {
-    backgroundColor: '#E3F5E1',
-    borderRadius: 8,
+    backgroundColor: theme.colors.surfaceContainerLow,
+    borderRadius: 12,
     padding: 20,
     marginBottom: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    borderLeftWidth: 4,
+    borderLeftColor: theme.colors.tertiary,
   },
   selectedScenarioInfo: {
     flex: 1,
   },
   selectedScenarioName: {
     fontSize: scaleFontSize(20),
-    fontWeight: 'bold',
-    color: '#168821',
+    fontWeight: '700',
+    color: theme.colors.text,
     marginBottom: 4,
   },
   selectedScenarioDescription: {
     fontSize: scaleFontSize(14),
-    color: '#168821',
+    color: theme.colors.textSecondary,
   },
   resetButton: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 4,
+    backgroundColor: theme.colors.surfaceContainerLowest,
+    borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: '#168821',
   },
   resetButtonText: {
-    color: '#168821',
+    color: theme.colors.primary,
     fontSize: scaleFontSize(14),
     fontWeight: '600',
   },
   labInputSection: {
-    backgroundColor: '#FFF5C2',
-    borderRadius: 8,
+    backgroundColor: theme.colors.surfaceContainerLow,
+    borderRadius: 12,
     padding: 20,
     marginBottom: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#FFCD07',
+    borderLeftColor: theme.colors.secondary,
   },
   challengeSection: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
+    backgroundColor: theme.colors.surfaceContainerLow,
+    borderRadius: 12,
     padding: 20,
     marginBottom: 12,
   },
   challengeDisplay: {
-    backgroundColor: '#EEEEEE',
-    borderRadius: 4,
+    backgroundColor: theme.colors.surfaceContainerHighest,
+    borderRadius: 8,
     padding: 16,
     marginBottom: 8,
     maxHeight: 200,
@@ -431,11 +432,11 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   challengeText: {
     fontSize: scaleFontSize(12),
     fontFamily: 'monospace',
-    color: '#333333',
+    color: theme.colors.textSecondary,
   },
   copyButton: {
-    backgroundColor: '#FFCD07',
-    borderRadius: 8,
+    backgroundColor: theme.colors.secondaryContainer,
+    borderRadius: 12,
     paddingVertical: 10,
     paddingHorizontal: 16,
     alignItems: 'center',
@@ -444,32 +445,30 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     gap: 6,
   },
   copyButtonText: {
-    color: '#071D41',
+    color: theme.colors.onSecondaryContainer,
     fontSize: scaleFontSize(14),
     fontWeight: '600',
   },
   presentationSection: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
+    backgroundColor: theme.colors.surfaceContainerLow,
+    borderRadius: 12,
     padding: 20,
     marginBottom: 12,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#EEEEEE',
-    borderStyle: 'dashed',
-    borderRadius: 4,
+    borderWidth: 0,
+    borderRadius: 8,
     padding: 16,
     fontSize: scaleFontSize(14),
-    color: '#333333',
-    backgroundColor: '#FFFFFF',
+    color: theme.colors.text,
+    backgroundColor: theme.colors.surfaceContainerHighest,
     minHeight: 100,
     textAlignVertical: 'top',
     marginBottom: 8,
   },
   button: {
-    backgroundColor: '#1351B4',
-    borderRadius: 8,
+    backgroundColor: theme.colors.primary,
+    borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 24,
     alignItems: 'center',
@@ -478,36 +477,37 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     gap: 8,
   },
   buttonDisabled: {
-    backgroundColor: '#888888',
+    opacity: 0.5,
   },
   buttonText: {
-    color: '#FFFFFF',
+    color: theme.colors.onPrimary,
     fontSize: scaleFontSize(16),
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
   validationResult: {
-    borderRadius: 8,
+    borderRadius: 12,
     padding: 24,
     marginTop: 12,
     alignItems: 'center',
     borderLeftWidth: 4,
+    ...theme.shadows.medium as object,
   },
   validationSuccess: {
-    backgroundColor: '#FFFFFF',
-    borderLeftColor: '#168821',
+    backgroundColor: theme.colors.surfaceContainerLowest,
+    borderLeftColor: theme.colors.tertiary,
   },
   validationFailure: {
-    backgroundColor: '#FDE0DB',
-    borderLeftColor: '#E52207',
+    backgroundColor: theme.colors.errorLight,
+    borderLeftColor: theme.colors.error,
   },
   validationIcon: {
     fontSize: scaleFontSize(48),
     marginBottom: 8,
   },
   validationIconCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: 'center' as const,
     justifyContent: 'center' as const,
     alignSelf: 'center' as const,
@@ -515,7 +515,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   validationMetadata: {
     fontSize: scaleFontSize(14),
-    color: '#168821',
+    color: theme.colors.textSecondary,
     marginBottom: 8,
   },
   scenarioIconRow: {
@@ -524,18 +524,18 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     marginBottom: 4,
   },
   scenarioIconCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(19,81,180,0.1)',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#D9E2FF',
     alignItems: 'center' as const,
     justifyContent: 'center' as const,
     marginRight: 12,
   },
   validationTitle: {
     fontSize: scaleFontSize(20),
-    fontWeight: 'bold',
-    color: '#333333',
+    fontWeight: '700',
+    color: theme.colors.text,
     marginBottom: 8,
   },
   validationErrors: {
@@ -544,7 +544,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   },
   validationErrorText: {
     fontSize: scaleFontSize(14),
-    color: '#E52207',
+    color: theme.colors.error,
     marginBottom: 4,
   },
   trustChainStatus: {
@@ -552,8 +552,6 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     alignItems: 'center',
     marginTop: 8,
     paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: '#EEEEEE',
   },
   trustChainIcon: {
     fontSize: scaleFontSize(16),
@@ -564,23 +562,21 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     fontWeight: '600',
   },
   trustChainValid: {
-    color: '#168821',
+    color: theme.colors.tertiary,
   },
   trustChainInvalid: {
-    color: '#E52207',
+    color: theme.colors.error,
   },
   qrContainer: {
     alignItems: 'center',
     padding: 24,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
+    backgroundColor: theme.colors.surfaceContainerLowest,
+    borderRadius: 12,
     marginBottom: 8,
-    borderWidth: 1,
-    borderColor: '#EEEEEE',
   },
   qrHint: {
     fontSize: scaleFontSize(14),
-    color: '#888888',
+    color: theme.colors.textSecondary,
     marginTop: 8,
     textAlign: 'center',
   },

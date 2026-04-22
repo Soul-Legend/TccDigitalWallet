@@ -30,12 +30,13 @@ const createStyles = (theme: Theme) =>
     title: {
       fontSize: scaleFontSize(32),
       fontWeight: '900',
-      color: '#071D41',
+      color: theme.colors.primary,
       marginBottom: 4,
+      letterSpacing: -0.5,
     },
     subtitle: {
       fontSize: scaleFontSize(14),
-      color: '#888888',
+      color: theme.colors.textSecondary,
       marginBottom: 12,
     },
     statsContainer: {
@@ -47,21 +48,21 @@ const createStyles = (theme: Theme) =>
     },
     statsText: {
       fontSize: scaleFontSize(12),
-      color: '#888888',
+      color: theme.colors.textDisabled,
     },
     clearButton: {
-      backgroundColor: '#E52207',
+      backgroundColor: theme.colors.primary,
       paddingHorizontal: 16,
       paddingVertical: 8,
-      borderRadius: 4,
+      borderRadius: 8,
     },
     clearButtonText: {
-      color: '#FFFFFF',
+      color: theme.colors.onPrimary,
       fontSize: scaleFontSize(12),
       fontWeight: '600',
     },
     copyErrorsButton: {
-      backgroundColor: '#1351B4',
+      backgroundColor: theme.colors.primary,
       paddingHorizontal: 16,
       paddingVertical: 10,
       borderRadius: 8,
@@ -70,7 +71,7 @@ const createStyles = (theme: Theme) =>
       marginRight: 12,
     },
     copyErrorsButtonText: {
-      color: '#FFFFFF',
+      color: theme.colors.onPrimary,
       fontSize: scaleFontSize(12),
       fontWeight: '600',
       marginLeft: 4,
@@ -91,13 +92,13 @@ const createStyles = (theme: Theme) =>
     },
     emptyText: {
       fontSize: scaleFontSize(18),
-      fontWeight: 'bold',
-      color: '#888888',
+      fontWeight: '700',
+      color: theme.colors.textDisabled,
       marginBottom: 8,
     },
     emptySubtext: {
       fontSize: scaleFontSize(14),
-      color: '#888888',
+      color: theme.colors.textDisabled,
       textAlign: 'center',
     },
     logsList: {
