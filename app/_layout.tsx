@@ -1,15 +1,21 @@
 import React from 'react';
 import {Stack} from 'expo-router';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {useFonts} from 'expo-font';
 
 /**
  * Root layout for the digital wallet app.
- *
- * Uses a Stack with two routes:
- * - `index` (initialization) shown without header
- * - `(tabs)` group with bottom tab navigation for all main screens
  */
 export default function RootLayout(): React.JSX.Element {
+  const [fontsLoaded] = useFonts({
+    MaterialIcons: require('@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialIcons.ttf'),
+    MaterialCommunityIcons: require('@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf'),
+  });
+
+  if (!fontsLoaded) {
+    return <></>;
+  }
+
   return (
     <SafeAreaProvider>
       <Stack
