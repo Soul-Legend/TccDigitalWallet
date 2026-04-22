@@ -42,7 +42,8 @@ const createStyles = (theme: Theme) =>
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginTop: 8,
+      marginTop: 12,
+      gap: 12,
     },
     statsText: {
       fontSize: scaleFontSize(12),
@@ -61,12 +62,12 @@ const createStyles = (theme: Theme) =>
     },
     copyErrorsButton: {
       backgroundColor: '#1351B4',
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderRadius: 4,
+      paddingHorizontal: 16,
+      paddingVertical: 10,
+      borderRadius: 8,
       flexDirection: 'row' as const,
       alignItems: 'center' as const,
-      marginRight: 8,
+      marginRight: 12,
     },
     copyErrorsButtonText: {
       color: '#FFFFFF',

@@ -23,6 +23,10 @@
       },
       "package": "com.anonymous.DigitalWalletExpo"
     },
+    "androidStatusBar": {
+      "backgroundColor": "#1351B4",
+      "barStyle": "light-content"
+    },
     "web": {
       "favicon": "./assets/favicon.png"
     },
