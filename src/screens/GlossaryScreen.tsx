@@ -71,6 +71,8 @@ const createStyles = (theme: Theme) =>
     categoryScroll: {
       borderBottomWidth: 1,
       borderBottomColor: '#EEEEEE',
+      flexGrow: 0,
+      flexShrink: 0,
     },
     categoryContainer: {
       paddingHorizontal: 16,
