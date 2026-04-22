@@ -1,6 +1,7 @@
 import React from 'react';
 import {Tabs} from 'expo-router';
 import {MaterialCommunityIcons} from '@expo/vector-icons';
+import {MaterialIcons} from '@expo/vector-icons';
 import {getTheme} from '../../src/utils/theme';
 
 export default function TabsLayout(): React.JSX.Element {
@@ -9,49 +10,37 @@ export default function TabsLayout(): React.JSX.Element {
   return (
     <Tabs
       screenOptions={{
-        headerStyle: {backgroundColor: theme.colors.primaryContainer},
+        headerStyle: {backgroundColor: theme.colors.primary},
         headerTintColor: theme.colors.onPrimary,
         headerTitleStyle: {fontWeight: 'bold', fontSize: 18},
         tabBarStyle: {
-          backgroundColor: theme.colors.surface,
+          backgroundColor: '#FFFFFF',
           borderTopColor: theme.colors.divider,
           borderTopWidth: 1,
           paddingBottom: 8,
-          paddingTop: 4,
-          height: 64,
+          paddingTop: 6,
+          height: 72,
           elevation: 8,
           shadowColor: '#000',
           shadowOffset: {width: 0, height: -2},
           shadowOpacity: 0.05,
           shadowRadius: 8,
         },
-        tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor: theme.colors.textDisabled,
+        tabBarActiveTintColor: '#1351B4',
+        tabBarInactiveTintColor: '#888888',
         tabBarLabelStyle: {
-          fontSize: 10,
+          fontSize: 11,
           fontWeight: '600',
-          textTransform: 'uppercase',
-          letterSpacing: 0.5,
         },
         animation: 'shift',
       }}>
       <Tabs.Screen
         name="home"
         options={{
-          title: 'Início',
+          title: 'Carteira',
           headerTitle: 'Identidade Universitária',
           tabBarIcon: ({color, size}) => (
-            <MaterialCommunityIcons name="home" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="titular"
-        options={{
-          title: 'Carteira',
-          headerTitle: 'Minha Carteira',
-          tabBarIcon: ({color, size}) => (
-            <MaterialCommunityIcons name="wallet" size={size} color={color} />
+            <MaterialIcons name="account-balance-wallet" size={size} color={color} />
           ),
         }}
       />
@@ -59,29 +48,40 @@ export default function TabsLayout(): React.JSX.Element {
         name="emissor"
         options={{
           title: 'Emitir',
-          headerTitle: 'Nova Credencial',
+          headerTitle: 'Nova Credencial Acadêmica',
           tabBarIcon: ({color, size}) => (
-            <MaterialCommunityIcons name="shield-plus" size={size} color={color} />
+            <MaterialIcons name="note-add" size={size} color={color} />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="titular"
+        options={{
+          title: 'Carteira',
+          headerTitle: 'Minha Carteira Acadêmica',
+          tabBarIcon: ({color, size}) => (
+            <MaterialIcons name="account-balance-wallet" size={size} color={color} />
+          ),
+          href: null,
         }}
       />
       <Tabs.Screen
         name="verificador"
         options={{
-          title: 'Verificar',
-          headerTitle: 'Verificador',
+          title: 'Validar',
+          headerTitle: 'Verificador de Credenciais',
           tabBarIcon: ({color, size}) => (
-            <MaterialCommunityIcons name="shield-check" size={size} color={color} />
+            <MaterialIcons name="verified-user" size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="logs"
         options={{
-          title: 'Logs',
-          headerTitle: 'Atividades',
+          title: 'Eventos',
+          headerTitle: 'Eventos',
           tabBarIcon: ({color, size}) => (
-            <MaterialCommunityIcons name="history" size={size} color={color} />
+            <MaterialIcons name="history" size={size} color={color} />
           ),
         }}
       />
@@ -91,7 +91,7 @@ export default function TabsLayout(): React.JSX.Element {
           title: 'Glossário',
           headerTitle: 'Glossário SSI',
           tabBarIcon: ({color, size}) => (
-            <MaterialCommunityIcons name="book-open-variant" size={size} color={color} />
+            <MaterialIcons name="menu-book" size={size} color={color} />
           ),
         }}
       />

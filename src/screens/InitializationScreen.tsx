@@ -48,7 +48,7 @@ const createStyles = (theme: Theme) =>
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      paddingHorizontal: theme.spacing.lg,
+      paddingHorizontal: 16,
     },
     loadingText: {
       fontSize: scaleFontSize(theme.typography.fontSizeLarge + 2),
@@ -62,61 +62,54 @@ const createStyles = (theme: Theme) =>
       marginTop: theme.spacing.sm,
     },
     successIconContainer: {
-      width: 96,
-      height: 96,
-      borderRadius: 48,
-      backgroundColor: theme.colors.tertiaryFixed,
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      backgroundColor: 'rgba(22, 136, 33, 0.2)',
       alignItems: 'center',
       justifyContent: 'center',
       marginBottom: theme.spacing.lg,
-      ...theme.shadows.large as object,
     },
     successTitle: {
-      fontSize: scaleFontSize(28),
-      fontWeight: 'bold',
-      color: theme.colors.text,
+      fontSize: scaleFontSize(32),
+      fontWeight: '900',
+      color: theme.colors.primary,
       marginBottom: theme.spacing.md,
       textAlign: 'center',
-      letterSpacing: -0.5,
+      lineHeight: 38,
     },
     successSubtitle: {
-      fontSize: scaleFontSize(theme.typography.fontSizeLarge),
+      fontSize: scaleFontSize(16),
       color: theme.colors.textSecondary,
       textAlign: 'center',
       lineHeight: 24,
-      marginBottom: theme.spacing.xl,
+      marginBottom: 24,
       maxWidth: 320,
     },
     didContainer: {
-      backgroundColor: theme.colors.surfaceContainerLow,
-      borderRadius: theme.borderRadius.large,
-      padding: theme.spacing.lg,
+      backgroundColor: '#EEEEEE',
+      borderRadius: theme.borderRadius.small,
+      padding: 16,
       marginBottom: theme.spacing.xl,
       width: '100%',
       borderLeftWidth: 4,
-      borderLeftColor: theme.colors.primary,
+      borderLeftColor: '#1351B4',
     },
     didLabelRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
       marginBottom: theme.spacing.sm,
-      gap: 6,
     },
     didLabel: {
-      fontSize: scaleFontSize(theme.typography.fontSizeSmall),
-      fontWeight: '700',
-      color: theme.colors.textSecondary,
+      fontSize: scaleFontSize(12),
+      fontWeight: '600',
+      color: '#071D41',
       textTransform: 'uppercase',
-      letterSpacing: 1,
+      letterSpacing: 0.5,
     },
     didTextContainer: {
-      backgroundColor: theme.colors.surfaceContainerHighest,
-      borderRadius: theme.borderRadius.small,
-      padding: theme.spacing.md,
     },
     didText: {
-      fontSize: scaleFontSize(theme.typography.fontSizeSmall),
-      color: theme.colors.textSecondary,
+      fontSize: scaleFontSize(13),
+      color: '#071D41',
       fontFamily: 'monospace',
     },
     infoText: {
@@ -128,26 +121,26 @@ const createStyles = (theme: Theme) =>
       maxWidth: 320,
     },
     continueButton: {
-      backgroundColor: theme.colors.primary,
+      backgroundColor: '#071D41',
       paddingVertical: theme.spacing.md,
       paddingHorizontal: theme.spacing.xl + 8,
-      borderRadius: theme.borderRadius.large,
+      borderRadius: 12,
       width: '100%',
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
       gap: 8,
-      ...(theme.shadows.medium as object),
+      minHeight: 52,
     },
     continueButtonText: {
-      color: theme.colors.onPrimary,
+      color: '#FFFFFF',
       fontSize: scaleFontSize(theme.typography.fontSizeLarge),
       fontWeight: 'bold',
     },
     errorIconContainer: {
-      width: 96,
-      height: 96,
-      borderRadius: 48,
+      width: 80,
+      height: 80,
+      borderRadius: 40,
       backgroundColor: theme.colors.errorLight,
       alignItems: 'center',
       justifyContent: 'center',
@@ -172,10 +165,10 @@ const createStyles = (theme: Theme) =>
       backgroundColor: theme.colors.error,
       paddingVertical: theme.spacing.md,
       paddingHorizontal: theme.spacing.xl + 8,
-      borderRadius: theme.borderRadius.large,
+      borderRadius: 12,
       width: '100%',
       alignItems: 'center',
-      ...(theme.shadows.medium as object),
+      minHeight: 52,
     },
     retryButtonText: {
       color: '#FFFFFF',
@@ -291,7 +284,7 @@ const InitializationScreen: React.FC = () => {
         return (
           <View style={styles.contentContainer}>
             <View style={styles.successIconContainer}>
-              <MaterialCommunityIcons name="check-circle" size={56} color={theme.colors.tertiary} />
+              <MaterialCommunityIcons name="check-bold" size={40} color="#168821" />
             </View>
             <Text style={styles.successTitle}>
               Identidade Acadêmica Criada
@@ -301,8 +294,7 @@ const InitializationScreen: React.FC = () => {
             </Text>
             <View style={styles.didContainer}>
               <View style={styles.didLabelRow}>
-                <MaterialCommunityIcons name="fingerprint" size={14} color={theme.colors.textSecondary} />
-                <Text style={styles.didLabel}>Seu Identificador Descentralizado</Text>
+                <Text style={styles.didLabel}>SEU IDENTIFICADOR DESCENTRALIZADO</Text>
               </View>
               <View style={styles.didTextContainer}>
                 <Text style={styles.didText} numberOfLines={3}>
@@ -313,8 +305,7 @@ const InitializationScreen: React.FC = () => {
             <TouchableOpacity
               style={styles.continueButton}
               onPress={handleContinue}>
-              <Text style={styles.continueButtonText}>Continuar</Text>
-              <MaterialCommunityIcons name="arrow-right" size={20} color={theme.colors.onPrimary} />
+              <Text style={styles.continueButtonText}>Continuar →</Text>
             </TouchableOpacity>
           </View>
         );
