@@ -114,6 +114,19 @@ export default function TabsLayout(): React.JSX.Element {
           ),
         }}
       />
+      <Tabs.Screen
+        name="diagnosticos"
+        options={{
+          title: 'Diag',
+          headerTitle: 'Diagnóstico de Runtime',
+          // eslint-disable-next-line react/no-unstable-nested-components
+          tabBarIcon: ({color, size}) => (
+            <MaterialIcons name="bug-report" size={size} color={color} />
+          ),
+          // Only show in dev builds; hidden in production
+          href: typeof __DEV__ !== 'undefined' && __DEV__ ? undefined : null,
+        }}
+      />
     </Tabs>
   );
 }

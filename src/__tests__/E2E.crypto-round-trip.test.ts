@@ -132,14 +132,16 @@ describe('E2E: Crypto Round-Trip Verification', () => {
       const tampered = JSON.parse(JSON.stringify(presentation));
       tampered.disclosed_attributes.isencao_ru = false;
 
-      // Reconstruct payload with TAMPERED attributes
-      const tamperedPayload = JSON.stringify({
+      // Reconstruct payload with TAMPERED attributes using the same
+      // canonical encoding the holder used to sign.
+      const tamperedPayload = canonicalize({
         '@context': tampered['@context'],
-        type: tampered.type,
+        challenge: tampered.proof.challenge ?? null,
+        disclosed_attributes: tampered.disclosed_attributes ?? {},
+        hashed_attributes: tampered.hashed_attributes ?? {},
         holder: tampered.holder,
+        type: tampered.type,
         verifiableCredential: tampered.verifiableCredential,
-        disclosed_attributes: tampered.disclosed_attributes,
-        hashed_attributes: tampered.hashed_attributes,
       });
 
       const holderPublicKey = await StorageService.getHolderPublicKey();
@@ -169,13 +171,16 @@ describe('E2E: Crypto Round-Trip Verification', () => {
       const tampered = JSON.parse(JSON.stringify(presentation));
       tampered.holder = 'did:key:z6MkATTACKER';
 
-      const tamperedPayload = JSON.stringify({
+      // Reconstruct payload with TAMPERED holder using the same
+      // canonical encoding the holder used to sign.
+      const tamperedPayload = canonicalize({
         '@context': tampered['@context'],
-        type: tampered.type,
+        challenge: tampered.proof.challenge ?? null,
+        disclosed_attributes: tampered.disclosed_attributes ?? {},
+        hashed_attributes: tampered.hashed_attributes ?? {},
         holder: tampered.holder,
+        type: tampered.type,
         verifiableCredential: tampered.verifiableCredential,
-        disclosed_attributes: tampered.disclosed_attributes,
-        hashed_attributes: tampered.hashed_attributes,
       });
 
       const holderPublicKey = await StorageService.getHolderPublicKey();
@@ -307,12 +312,12 @@ describe('E2E: Crypto Round-Trip Verification', () => {
         'Evil Dept',
       );
 
-      // Tamper: change the child's name in the payload
-      const tamperedPayload = JSON.stringify({
+      // Tamper: change the child's name in the canonical payload
+      const tamperedPayload = canonicalize({
         did: child.did,
-        publicKey: child.publicKey,
         name: 'Trusted Dept', // Changed from 'Evil Dept'
         parentDid: child.parentDid,
+        publicKey: child.publicKey,
       });
 
       // Certificate should NOT verify against tampered payload

@@ -20,6 +20,7 @@ export const Routes = {
   Verificador: '/verificador',
   Logs: '/logs',
   Glossario: '/glossario',
+  Diagnosticos: '/diagnosticos',
 } as const;
 
 export type RouteName = keyof typeof Routes;
