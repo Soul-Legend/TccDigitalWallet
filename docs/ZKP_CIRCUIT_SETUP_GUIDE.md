@@ -245,7 +245,11 @@ A Powers-of-Tau ceremony file is needed as the universal component of the setup.
 
 ```powershell
 # Download the ptau file (~30 MB)
-curl -L -o circuits\build\pot12_final.ptau https://storage.googleapis.com/zkevm/ptau/powersOfTau28_hez_final_12.ptau
+# IMPORTANT: In PowerShell, use curl.exe (not curl, which is an alias for Invoke-WebRequest)
+curl.exe -L -o circuits\build\pot12_final.ptau https://storage.googleapis.com/zkevm/ptau/powersOfTau28_hez_final_12.ptau
+
+# Alternative using PowerShell native cmdlet:
+# Invoke-WebRequest -Uri "https://storage.googleapis.com/zkevm/ptau/powersOfTau28_hez_final_12.ptau" -OutFile "circuits\build\pot12_final.ptau"
 ```
 
 > **Note:** If your circuits have more than 4096 constraints, use a larger ptau file (e.g., `_14.ptau` for 16384 constraints, `_16.ptau` for 65536). The `age_range` circuit with circomlib comparators may need a larger file — check the constraint count in the compilation output.
