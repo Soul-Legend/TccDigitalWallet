@@ -24,4 +24,4 @@ template Nullifier() {
     nullifier <== hasher.out;
 }
 
-component main {public []} = Nullifier();
+component main = Nullifier();
